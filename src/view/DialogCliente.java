@@ -9,7 +9,6 @@ import db.ClienteDao;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -624,7 +623,16 @@ public class DialogCliente extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        JOptionPane.showConfirmDialog(this, "Tem certeza que deseja apagar " + campoNome.getText() + " ?", "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (tabelaCliente.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado","Opção inválida",JOptionPane.WARNING_MESSAGE);
+        } else {
+            int opcao = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja apagar " + campoNome.getText() + " ?",
+                    "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (opcao == JOptionPane.YES_OPTION) {
+                clienteDao.delete(modeloTabela.get(current).getId());
+                modeloTabela.remove(current);
+            }
+        }
     }//GEN-LAST:event_botaoApagaActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
