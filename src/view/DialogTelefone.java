@@ -7,7 +7,10 @@ package view;
 
 import db.TelefoneDao;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -18,15 +21,18 @@ import utilitarios.TelefoneTM;
  *
  * @author Leandro Guina
  */
-public class DialogTelefone extends javax.swing.JDialog {
+public class DialogTelefone extends javax.swing.JDialog implements ActionListener {
 
     private final TelefoneDao telefoneDao;
     private final TelefoneTM modeloTabela;
+    private final DefaultComboBoxModel modeloCombo;
     private static final int QWERY = 0;
     private static final int INSERT = 1;
     private static final int UPDATE = 2;
+    private static final int DIALOG = 3;
     private int current;
     private int modo;
+    private boolean comboLock;
 
     /**
      * Creates new form DialogTelefone
@@ -34,6 +40,7 @@ public class DialogTelefone extends javax.swing.JDialog {
     public DialogTelefone() {
         telefoneDao = new TelefoneDao();
         modeloTabela = new TelefoneTM(telefoneDao.getAll());
+        modeloCombo = new DefaultComboBoxModel();
         initComponents();
         inicializa();
     }
@@ -41,9 +48,8 @@ public class DialogTelefone extends javax.swing.JDialog {
     public DialogTelefone(Frame owner, boolean modal) {
         super(owner, modal);
         telefoneDao = new TelefoneDao();
-//        modeloTabela = new TelefoneTM(telefoneDao.getAll());
         modeloTabela = new TelefoneTM();
-        
+        modeloCombo = new DefaultComboBoxModel();
         initComponents();
         inicializa();
     }
@@ -51,9 +57,9 @@ public class DialogTelefone extends javax.swing.JDialog {
     private void inicializa() {
         current = 0;
         modo = QWERY;
-        
-        
-        
+        comboLock = false;
+        comboNome.setModel(modeloCombo);
+        comboNome.addActionListener(this);
         tabelaTelefone.setModel(modeloTabela);
         tabelaTelefone.getColumnModel().getColumn(0).setPreferredWidth(40);
         tabelaTelefone.getColumnModel().getColumn(0).setResizable(false);
@@ -68,22 +74,26 @@ public class DialogTelefone extends javax.swing.JDialog {
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, true, false, true, true, true, false, true, true);
+                setInterface(false, true, false, true, true, true, false, true, true, true);
                 break;
             case INSERT:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, false, true, false, true);
+                setInterface(true, false, true, false, false, false, true, false, false, true);
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, false, true, true, false);
+                setInterface(true, false, true, false, false, false, true, false, true, false);
+                break;
+            case DIALOG:
+                this.modo = modo;
+                setInterface(false, false, true, true, true, true, false, true, false, true);
                 break;
             default:
                 break;
         }
     }
 
-    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela, boolean limpaCampos) {
+    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela, boolean combo, boolean limpaCampos) {
         limpaCampos(limpaCampos);
         campoNumero.setEnabled(nome);
         botaoSalva.setEnabled(salva);
@@ -95,22 +105,41 @@ public class DialogTelefone extends javax.swing.JDialog {
         botaoAnterior.setEnabled(navegacao);
         botaoProximo.setEnabled(navegacao);
         botaoUltimo.setEnabled(navegacao);
+        comboNome.setEnabled(combo);
         tabelaTelefone.setRowSelectionAllowed(tabela);
         tabelaTelefone.setFocusable(tabela);
     }
 
     private void preencheCampos() {
         Telefone telefone = modeloTabela.get(current);
-//        campoNome.setText(telefone.getId().toString()); //mudar para nome
         campoNumero.setText(telefone.getNumero());
     }
 
     private void limpaCampos(boolean opcao) {
         if (opcao) {
-//            campoNome.setText("");
-            campoNumero.setText("");
+            campoNumero.setValue(null);
             tabelaTelefone.clearSelection();
         }
+    }
+
+    private void reloadCombo() {
+        comboNome.removeActionListener(this);
+        modeloCombo.removeAllElements();
+        modeloCombo.addElement("");
+        if (radioCliente.isSelected()) {
+            modeloCombo.addAll(telefoneDao.clientes());
+        } else if (radioFornecedor.isSelected()) {
+            modeloCombo.addAll(telefoneDao.fornecedores());
+        }
+        comboNome.addActionListener(this);
+    }
+
+    private boolean validaCampos() {
+        if (campoNumero.getValue() == null || comboNome.getSelectedItem().equals("")) {
+            JOptionPane.showMessageDialog(this, "Confira os dados selecionados, registro incompleto", "Resgisto incompleto", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
     }
 
     private void setCurrent(int current) {
@@ -294,9 +323,9 @@ public class DialogTelefone extends javax.swing.JDialog {
 
         grupoRadio.add(radioCliente);
         radioCliente.setText("Cliente");
-        radioCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioClienteActionPerformed(evt);
+        radioCliente.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                radioClienteItemStateChanged(evt);
             }
         });
 
@@ -305,19 +334,13 @@ public class DialogTelefone extends javax.swing.JDialog {
 
         labelNome.setText("Nome:");
 
-        comboNome.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboNomeActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(radioCliente)
@@ -341,37 +364,37 @@ public class DialogTelefone extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(11, 11, 11)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(radioCliente)
                     .addComponent(labelNome)
-                    .addComponent(comboNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(comboNome, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel2)
                     .addComponent(campoNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(radioFornecedor))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botaoSalva, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
-                    .addComponent(botaoEdita, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botaoApaga, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
@@ -389,17 +412,17 @@ public class DialogTelefone extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -412,22 +435,29 @@ public class DialogTelefone extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoNovoActionPerformed
 
     private void botaoSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvaActionPerformed
-        if (modo == INSERT) {
-            Telefone telefone = new Telefone(campoNumero.getText());
-            int id = telefoneDao.save(telefone);
-            telefone.setId(id);
-            modeloTabela.add(telefone);
-        } else if (modo == UPDATE) {
-//            Telefone telefone = new Telefone(Integer.valueOf(campoNome.getText()), campoNumero.getText());
-//            telefoneDao.update(telefone);
-//            modeloTabela.setValueAt(telefone, current);
+        if (validaCampos()) {
+
+            if (modo == INSERT) {
+                Telefone telefone = new Telefone(campoNumero.getText());
+                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), radioCliente.isSelected());
+                telefone.setId(id);
+                modeloTabela.add(telefone);
+            } else if (modo == UPDATE) {
+                Telefone telefone = new Telefone(modeloTabela.get(current).getId(), campoNumero.getText());
+                telefoneDao.update(telefone);
+                modeloTabela.setValueAt(telefone, current);
+            }
         }
         setModo(QWERY);
     }//GEN-LAST:event_botaoSalvaActionPerformed
 
     private void botaoEditaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEditaActionPerformed
-        setModo(UPDATE);
-        campoNumero.requestFocus();
+        if (tabelaTelefone.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            setModo(UPDATE);
+            campoNumero.requestFocus();
+        }
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
@@ -447,9 +477,12 @@ public class DialogTelefone extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoVoltaActionPerformed
 
     private void tabelaTelefoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaTelefoneMouseClicked
-        setCurrent(tabelaTelefone.getSelectedRow());
-        if (modo == UPDATE)
-            setModo(QWERY);
+        if (modo == QWERY) {
+            setCurrent(tabelaTelefone.getSelectedRow());
+            if (modo == UPDATE) {
+//            setModo(QWERY);
+            }
+        }
     }//GEN-LAST:event_tabelaTelefoneMouseClicked
 
     private void botaoPrimeiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoPrimeiroActionPerformed
@@ -458,13 +491,16 @@ public class DialogTelefone extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoPrimeiroActionPerformed
 
     private void botaoProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoProximoActionPerformed
-        int size = modeloTabela.getRowCount();
-        if (tabelaTelefone.getSelectedRow() == -1) {
-            setCurrent(0);
-        } else if (size > 1 && current < size - 1) {
-            setCurrent(current + 1);
+        if (!modeloTabela.isEmpty()) {
+            int size = modeloTabela.getRowCount();
+            if (tabelaTelefone.getSelectedRow() == -1) {
+                setCurrent(0);
+            } else if (size > 1 && current < size - 1) {
+                setCurrent(current + 1);
+
+            }
+            tabelaTelefone.setRowSelectionInterval(current, current);
         }
-        tabelaTelefone.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
@@ -473,26 +509,39 @@ public class DialogTelefone extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAnteriorActionPerformed
-        if (current > 0) {
-            setCurrent(current - 1);
+        if (!modeloTabela.isEmpty()) {
+            if (current > 0) {
+                setCurrent(current - 1);
+            }
+            tabelaTelefone.setRowSelectionInterval(current, current);
         }
-        tabelaTelefone.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoAnteriorActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
         setModo(QWERY);
     }//GEN-LAST:event_botaoCancelaActionPerformed
 
-    private void radioClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioClienteActionPerformed
-        comboNome.addItem("");
-        telefoneDao.clientes().forEach(s-> comboNome.addItem(s));
-    }//GEN-LAST:event_radioClienteActionPerformed
+    private void radioClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioClienteItemStateChanged
+        if (radioCliente.isSelected()) {
+            reloadCombo();
+        }
+    }//GEN-LAST:event_radioClienteItemStateChanged
 
-    private void comboNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboNomeActionPerformed
-        modeloTabela.limpar();
-        modeloTabela.addLista(telefoneDao.numeros(comboNome.getSelectedItem().toString()));
-    }//GEN-LAST:event_comboNomeActionPerformed
-
+    public List<String> dialog(){
+        setModo(DIALOG);
+        setVisible(true);
+        return modeloTabela.getLista();
+    }
+    
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == comboNome) {
+            modeloTabela.limpar();
+            modeloTabela.addLista(telefoneDao.numeros(comboNome.getSelectedItem().toString()));
+            System.out.println(campoNumero.getText());
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -511,13 +560,17 @@ public class DialogTelefone extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogTelefone.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogTelefone.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogTelefone.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogTelefone.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogTelefone.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogTelefone.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogTelefone.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogTelefone.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         //</editor-fold>
