@@ -216,8 +216,10 @@
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="0"/>
             </Property>
-            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboTelefoneActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -225,11 +227,13 @@
         <Component class="javax.swing.JButton" name="botaoNovoTelefone">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/imagens/addSmall.png"/>
+              <Image iconType="3" name="/imagens/edit_18p.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Novo Telefone"/>
-            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoTelefoneActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="labelEndereco">
           <Properties>
@@ -288,6 +292,9 @@
             <Property name="toolTipText" type="java.lang.String" value="Novo Bairro"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoBairroActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="botaoNovo">
           <Properties>
@@ -538,6 +545,9 @@
             <Property name="toolTipText" type="java.lang.String" value="Nova Cidade"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoCidadeActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="labelEstado">
           <Properties>
@@ -564,6 +574,9 @@
             <Property name="toolTipText" type="java.lang.String" value="Novo Estado"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoEstadoActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

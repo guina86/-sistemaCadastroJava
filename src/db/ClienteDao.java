@@ -92,6 +92,54 @@ public class ClienteDao implements Dao<Cliente> {
         }
         return 0;
     }
+    
+    public int save(Cliente cliente, List<String> telefones) {
+        String sql = "INSERT INTO clientes (nome, endereco, rg, cpf, id_bairro, id_cidade, id_estado) "
+                + "VALUES (?, ?, ?, ?,(SELECT id FROM bairros WHERE nome = ?), "
+                + "(SELECT id FROM cidades WHERE nome = ?), "
+                + "(SELECT id FROM estados WHERE nome = ?))";
+        String sql2 = "INSERT INTO telefones (numero) VALUES (?)";
+        String sql3 = "INSERT INTO telefone_cliente (id_telefone, id_cliente) VALUES (? , ?)";
+        try (Connection conn = ConectaBanco.getConexao();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps3 = conn.prepareStatement(sql3)) {
+            conn.setAutoCommit(false);
+            ps.setString(1, cliente.getNome());
+            ps.setString(2, cliente.getEndereco());
+            ps.setString(3, cliente.getRg());
+            ps.setString(4, cliente.getCpf());
+            ps.setString(5, cliente.getBairro());
+            ps.setString(6, cliente.getCidade());
+            ps.setString(7, cliente.getEstado());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            int id = 0;
+            if (rs.next()) {
+                 id = rs.getInt(1);
+            }
+            rs.close();
+            for(String telefone : telefones){
+                ps2.setString(1, telefone);
+                ps2.executeUpdate();
+                ResultSet rs2 = ps2.getGeneratedKeys();
+                int idTel = 0;
+                if(rs2.next()){
+                    idTel = rs2.getInt(1);
+                }
+                ps3.setInt(1, idTel);
+                ps3.setInt(2, id);
+                ps3.executeUpdate();
+                rs2.close();
+            }
+            conn.commit();
+            conn.setAutoCommit(true);
+            return id;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     @Override
     public void update(Cliente cliente) {

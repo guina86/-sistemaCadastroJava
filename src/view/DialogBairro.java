@@ -408,6 +408,7 @@ public class DialogBairro extends javax.swing.JDialog {
             int id = bairroDao.save(bairro);
             bairro.setId(id);
             modeloTabela.add(bairro);
+            current = modeloTabela.getRowCount() -1;
         } else if (modoEdicao.equals("update")) {
             Bairro bairro = new Bairro(Integer.valueOf(campoId.getText()), campoNome.getText(), comboCidade.getSelectedItem().toString());
             bairroDao.update(bairro);
@@ -498,6 +499,11 @@ public class DialogBairro extends javax.swing.JDialog {
         dialog.setVisible(true);
     }//GEN-LAST:event_botaoNovoCidadeActionPerformed
 
+    public String edtitBairro(){
+        setVisible(true);
+        return modeloTabela.get(current).getNome();
+    }
+    
     /**
      * @param args the command line arguments
      */

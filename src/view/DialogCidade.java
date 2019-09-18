@@ -407,6 +407,7 @@ public class DialogCidade extends javax.swing.JDialog {
             int id = cidadeDao.save(cidade);
             cidade.setId(id);
             modeloTabela.add(cidade);
+            current = modeloTabela.getRowCount() -1;
         } else if (modoEdicao.equals("update")) {
             Cidade cidade = new Cidade(Integer.valueOf(campoId.getText()), campoNome.getText(), comboEstado.getSelectedItem().toString());
             cidadeDao.update(cidade);
@@ -497,6 +498,12 @@ public class DialogCidade extends javax.swing.JDialog {
         dialog.setVisible(true);
     }//GEN-LAST:event_botaoNovoEstadoActionPerformed
 
+    public String edtitCidade(){
+        setVisible(true);
+        return modeloTabela.get(current).getNome();
+    }
+    
+    
     /**
      * @param args the command line arguments
      */

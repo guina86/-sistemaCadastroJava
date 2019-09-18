@@ -6,8 +6,10 @@
 package view;
 
 import db.ClienteDao;
+import java.awt.Frame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -89,15 +91,15 @@ public class DialogCliente extends javax.swing.JDialog {
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, false, false, false, false, false, false, false, false, false, false, false, true, false, true, true, false, true, true, true, true, true, true);
+                setInterface(false, false, false, false, true, false, false, false, true, false, false, false, true, false, true, true, false, true, true, true);
                 break;
             case INSERT:
                 this.modo = modo;
-                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, false, false, false, true, false);
+                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, false, false, false, true, false);
+                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
                 break;
             default:
                 break;
@@ -112,8 +114,8 @@ public class DialogCliente extends javax.swing.JDialog {
     private void setInterface(boolean nome, boolean rg, boolean cpf, boolean endereco,
             boolean telefone, boolean estado, boolean cidade, boolean bairro, boolean novoTelefone,
             boolean novoEstado, boolean novoCidade, boolean novoBairro, boolean novo,
-            boolean salva, boolean edita, boolean apaga, boolean cancela, boolean primeiro,
-            boolean anterior, boolean proximo, boolean ultimo, boolean volta, boolean tabela) {
+            boolean salva, boolean edita, boolean apaga, boolean cancela, boolean navegacao,
+            boolean volta, boolean tabela) {
 
         campoNome.setEnabled(nome);
         campoRg.setEnabled(rg);
@@ -132,10 +134,10 @@ public class DialogCliente extends javax.swing.JDialog {
         botaoEdita.setEnabled(edita);
         botaoApaga.setEnabled(apaga);
         botaoCancela.setEnabled(cancela);
-        botaoPrimeiro.setEnabled(primeiro);
-        botaoAnterior.setEnabled(anterior);
-        botaoProximo.setEnabled(proximo);
-        botaoUltimo.setEnabled(ultimo);
+        botaoPrimeiro.setEnabled(navegacao);
+        botaoAnterior.setEnabled(navegacao);
+        botaoProximo.setEnabled(navegacao);
+        botaoUltimo.setEnabled(navegacao);
         botaoVolta.setEnabled(volta);
         tabelaCliente.setRowSelectionAllowed(tabela);
         tabelaCliente.setFocusable(tabela);
@@ -237,6 +239,18 @@ public class DialogCliente extends javax.swing.JDialog {
                 comboCidade.getSelectedItem().toString(), comboEstado.getSelectedItem().toString());
     }
 
+    private List<String> getComboTelefones() {
+        List<String> lista = new ArrayList<>();
+        int j = comboTelefone.getModel().getSize();
+        for (int i = 0; i < j; i++) {
+            String itemAt = comboTelefone.getItemAt(i);
+            if (!itemAt.equals("")) {
+                lista.add(comboTelefone.getItemAt(i));
+            }
+        }
+        return lista;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -291,11 +305,19 @@ public class DialogCliente extends javax.swing.JDialog {
 
         labelTel.setText("Tel:");
 
-        comboTelefone.setEnabled(false);
+        comboTelefone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboTelefoneActionPerformed(evt);
+            }
+        });
 
-        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
+        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edit_18p.png"))); // NOI18N
         botaoNovoTelefone.setToolTipText("Novo Telefone");
-        botaoNovoTelefone.setEnabled(false);
+        botaoNovoTelefone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoNovoTelefoneActionPerformed(evt);
+            }
+        });
 
         labelEndereco.setText("Endereço:");
 
@@ -321,6 +343,11 @@ public class DialogCliente extends javax.swing.JDialog {
         botaoNovoBairro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
         botaoNovoBairro.setToolTipText("Novo Bairro");
         botaoNovoBairro.setEnabled(false);
+        botaoNovoBairro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoNovoBairroActionPerformed(evt);
+            }
+        });
 
         botaoNovo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/add_36p.png"))); // NOI18N
         botaoNovo.setToolTipText("Novo");
@@ -445,6 +472,11 @@ public class DialogCliente extends javax.swing.JDialog {
         botaoNovoCidade.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
         botaoNovoCidade.setToolTipText("Nova Cidade");
         botaoNovoCidade.setEnabled(false);
+        botaoNovoCidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoNovoCidadeActionPerformed(evt);
+            }
+        });
 
         labelEstado.setText("Estado:");
 
@@ -454,6 +486,11 @@ public class DialogCliente extends javax.swing.JDialog {
         botaoNovoEstado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
         botaoNovoEstado.setToolTipText("Novo Estado");
         botaoNovoEstado.setEnabled(false);
+        botaoNovoEstado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoNovoEstadoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -605,9 +642,10 @@ public class DialogCliente extends javax.swing.JDialog {
         if (validaCampos()) {
             Cliente cliente = colectaCampos();
             if (modo == INSERT) {
-                clienteDao.save(cliente);
+                List<String> telefones = getComboTelefones();
+                int id = clienteDao.save(cliente, telefones);
+                cliente.setId(id);
                 modeloTabela.add(cliente);
-                //todo salva telefone
             } else if (modo == UPDATE) {
                 clienteDao.update(cliente);
                 modeloTabela.setValueAt(cliente, current);
@@ -618,13 +656,17 @@ public class DialogCliente extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoSalvaActionPerformed
 
     private void botaoEditaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEditaActionPerformed
-        preparaCombos();
-        setModo(UPDATE);
+        if (tabelaCliente.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            preparaCombos();
+            setModo(UPDATE);
+        }
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
         if (tabelaCliente.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado","Opção inválida",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
         } else {
             int opcao = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja apagar " + campoNome.getText() + " ?",
                     "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -664,14 +706,55 @@ public class DialogCliente extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
-        current = modeloTabela.getRowCount() - 1;
+        setCurrent(modeloTabela.getRowCount() - 1);
         tabelaCliente.setRowSelectionInterval(current, current);
-        setCurrent(current);
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoVoltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoVoltaActionPerformed
         this.dispose();
     }//GEN-LAST:event_botaoVoltaActionPerformed
+
+    private void botaoNovoTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoTelefoneActionPerformed
+        DialogQuickTelefone dialog = new DialogQuickTelefone((Frame) getParent(), true);
+        if (modo == INSERT) {
+            List<String> lista = getComboTelefones();
+            comboTelefone.removeAllItems();
+            List<String> editTelefone = dialog.editTelefone("Novo Cliente", lista);
+            editTelefone.forEach(t -> comboTelefone.addItem(t));
+        } else {
+            dialog.editTelefone(modeloTabela.get(current).getNome(), null);
+            comboTelefone.removeAllItems();
+            Cliente cliente = modeloTabela.get(current);
+            List<String> telefones = clienteDao.telefones(cliente);
+            if (!telefones.isEmpty()) {
+                telefones.forEach(s -> comboTelefone.addItem(s));
+            } else {
+                comboTelefone.addItem("");
+            }
+        }
+    }//GEN-LAST:event_botaoNovoTelefoneActionPerformed
+
+    private void comboTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboTelefoneActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboTelefoneActionPerformed
+
+    private void botaoNovoEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoEstadoActionPerformed
+        String estado = new DialogEstado((Frame)getParent(), true).edtitEstado();
+        comboEstado.addItem(estado);
+        comboEstado.setSelectedItem(estado);
+    }//GEN-LAST:event_botaoNovoEstadoActionPerformed
+
+    private void botaoNovoCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoCidadeActionPerformed
+        String cidade = new DialogCidade((Frame)getParent(), true).edtitCidade();
+        comboCidade.addItem(cidade);
+        comboCidade.setSelectedItem(cidade);
+    }//GEN-LAST:event_botaoNovoCidadeActionPerformed
+
+    private void botaoNovoBairroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoBairroActionPerformed
+        String bairro = new DialogBairro((Frame)getParent(), true).edtitBairro();
+        comboBairro.addItem(bairro);
+        comboBairro.setSelectedItem(bairro);
+    }//GEN-LAST:event_botaoNovoBairroActionPerformed
 
     private void tabelaClienteMouseClicked() {
         if (modo == QWERY) {

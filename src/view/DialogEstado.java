@@ -389,11 +389,11 @@ public class DialogEstado extends javax.swing.JDialog {
             int id = estadoDao.save(estado);
             estado.setId(id);
             modeloTabela.add(estado);
+            current = modeloTabela.getRowCount() -1;
         } else if (modoEdicao.equals("update")) {
             Estado estado = new Estado(Integer.valueOf(campoId.getText()), campoNome.getText(), campoSigla.getText());
             estadoDao.update(estado);
             modeloTabela.setValueAt(estado, current);
-            System.out.println(modeloTabela.get(current));
         }
         setInterface(false, false, true, false, false, false, true, false, true, true);
     }//GEN-LAST:event_botaoSalvaActionPerformed
@@ -468,6 +468,11 @@ public class DialogEstado extends javax.swing.JDialog {
         setInterface(false, false, true, false, false, false, true, false, true, true);
     }//GEN-LAST:event_botaoCancelaActionPerformed
 
+    public String edtitEstado(){
+        setVisible(true);
+        return modeloTabela.get(current).getNome();
+    }
+    
     /**
      * @param args the command line arguments
      */

@@ -7,6 +7,7 @@ package utilitarios;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.swing.table.AbstractTableModel;
 import modelo.Telefone;
 
@@ -119,6 +120,10 @@ public class TelefoneTM extends AbstractTableModel {
         int tamanhoAntigo = getRowCount();
         linhas.addAll(lista);
         fireTableRowsInserted(tamanhoAntigo, getRowCount() - 1);
+    }
+    
+    public List<String> getLista(){
+        return linhas.stream().map(Telefone::getNumero).collect(Collectors.toList());
     }
     
     public void limpar(){
