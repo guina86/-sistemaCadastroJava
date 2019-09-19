@@ -5,7 +5,7 @@
  */
 package view;
 
-import db.ClienteDao;
+import db.FornecedorDao;
 import java.awt.Frame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,17 +14,17 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import modelo.Cliente;
-import utilitarios.ClienteTM;
+import modelo.Fornecedor;
+import utilitarios.FornecedorTM;
 
 /**
  *
  * @author Leandro Guina
  */
-public class DialogCliente extends javax.swing.JDialog {
+public class DialogFornecedor extends javax.swing.JDialog {
 
-    private final ClienteDao clienteDao;
-    private final ClienteTM modeloTabela;
+    private final FornecedorDao fornecedorDao;
+    private final FornecedorTM modeloTabela;
     private static final int QWERY = 0;
     private static final int INSERT = 1;
     private static final int UPDATE = 2;
@@ -33,12 +33,12 @@ public class DialogCliente extends javax.swing.JDialog {
     private boolean comboLock;
 
     /**
-     * Creates new form DialogCliente
+     * Creates new form DialogFornecedor
      */
-    public DialogCliente(java.awt.Frame parent, boolean modal) {
+    public DialogFornecedor(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        clienteDao = new ClienteDao();
-        modeloTabela = new ClienteTM(clienteDao.getAll());
+        fornecedorDao = new FornecedorDao();
+        modeloTabela = new FornecedorTM(fornecedorDao.getAll());
         initComponents();
         inicializa();
     }
@@ -53,9 +53,9 @@ public class DialogCliente extends javax.swing.JDialog {
         comboCidade.addItem("");
         comboBairro.addItem("");
         comboTelefone.addItem("");
-        clienteDao.estados().forEach(s -> comboEstado.addItem(s));
-        clienteDao.cidades().forEach(s -> comboCidade.addItem(s));
-        clienteDao.bairros().forEach(s -> comboBairro.addItem(s));
+        fornecedorDao.estados().forEach(s -> comboEstado.addItem(s));
+        fornecedorDao.cidades().forEach(s -> comboCidade.addItem(s));
+        fornecedorDao.bairros().forEach(s -> comboBairro.addItem(s));
         comboEstado.addActionListener(e -> comboEstadoActionPerformed(e));
         comboCidade.addActionListener(e -> comboCidadeActionPerformed(e));
 
@@ -74,15 +74,13 @@ public class DialogCliente extends javax.swing.JDialog {
         tabelaCliente.getColumnModel().getColumn(5).setResizable(false);
         tabelaCliente.getColumnModel().getColumn(6).setPreferredWidth(120);
         tabelaCliente.getColumnModel().getColumn(6).setResizable(false);
-        tabelaCliente.getColumnModel().getColumn(7).setPreferredWidth(120);
-        tabelaCliente.getColumnModel().getColumn(7).setResizable(false);
         tabelaCliente.getTableHeader().setReorderingAllowed(false);
         tabelaCliente.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabelaCliente.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tabelaCliente.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                tabelaClienteMouseClicked();
+                tabelaFornecedorMouseClicked();
             }
         });
     }
@@ -91,15 +89,15 @@ public class DialogCliente extends javax.swing.JDialog {
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, false, false, false, true, false, false, false, true, false, false, false, true, false, true, true, false, true, true, true);
+                setInterface(false, false, false, true, false, false, false, true, false, false, false, true, false, true, true, false, true, true, true);
                 break;
             case INSERT:
                 this.modo = modo;
-                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
+                setInterface(true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
+                setInterface(true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
                 break;
             default:
                 break;
@@ -111,15 +109,14 @@ public class DialogCliente extends javax.swing.JDialog {
         preencheCampos();
     }
 
-    private void setInterface(boolean nome, boolean rg, boolean cpf, boolean endereco,
+    private void setInterface(boolean nome, boolean cnpj, boolean endereco,
             boolean telefone, boolean estado, boolean cidade, boolean bairro, boolean novoTelefone,
             boolean novoEstado, boolean novoCidade, boolean novoBairro, boolean novo,
             boolean salva, boolean edita, boolean apaga, boolean cancela, boolean navegacao,
             boolean volta, boolean tabela) {
 
         campoNome.setEnabled(nome);
-        campoRg.setEnabled(rg);
-        campoCpf.setEnabled(cpf);
+        campoCnpj.setEnabled(cnpj);
         campoEndereco.setEnabled(endereco);
         comboTelefone.setEnabled(telefone);
         comboEstado.setEnabled(estado);
@@ -145,8 +142,7 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private void limpaCampos() {
         campoNome.setText("");
-        campoRg.setText("");
-        campoCpf.setText("");
+        campoCnpj.setText("");
         campoEndereco.setText("");
         comboEstado.setSelectedItem("");
         comboTelefone.removeAllItems();
@@ -162,9 +158,8 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private void resetaCampos() {
         campoNome.setText("");
-        campoRg.setText("");
-        campoCpf.setText("");
-        campoCpf.setValue(null);
+        campoCnpj.setText("");
+        campoCnpj.setValue(null);
         campoEndereco.setText("");
         comboTelefone.removeAllItems();
         comboEstado.removeAllItems();
@@ -174,9 +169,9 @@ public class DialogCliente extends javax.swing.JDialog {
         comboEstado.addItem("");
         comboCidade.addItem("");
         comboBairro.addItem("");
-        clienteDao.estados().forEach(s -> comboEstado.addItem(s));
-        clienteDao.cidades().forEach(s -> comboCidade.addItem(s));
-        clienteDao.bairros().forEach(s -> comboBairro.addItem(s));
+        fornecedorDao.estados().forEach(s -> comboEstado.addItem(s));
+        fornecedorDao.cidades().forEach(s -> comboCidade.addItem(s));
+        fornecedorDao.bairros().forEach(s -> comboBairro.addItem(s));
         comboEstado.setSelectedIndex(0);
         comboCidade.setSelectedItem(0);
         comboBairro.setSelectedItem(0);
@@ -184,16 +179,15 @@ public class DialogCliente extends javax.swing.JDialog {
     }
 
     private void preencheCampos() {
-        Cliente cliente = modeloTabela.get(current);
-        campoNome.setText(cliente.getNome());
-        campoRg.setText(cliente.getRg());
-        campoCpf.setText(cliente.getCpf());
-        campoEndereco.setText(cliente.getEndereco());
-        comboEstado.setSelectedItem(cliente.getEstado());
-        comboCidade.setSelectedItem(cliente.getCidade());
-        comboBairro.setSelectedItem(cliente.getBairro());
+        Fornecedor fornecedor = modeloTabela.get(current);
+        campoNome.setText(fornecedor.getNome());
+        campoCnpj.setText(fornecedor.getCnpj());
+        campoEndereco.setText(fornecedor.getEndereco());
+        comboEstado.setSelectedItem(fornecedor.getEstado());
+        comboCidade.setSelectedItem(fornecedor.getCidade());
+        comboBairro.setSelectedItem(fornecedor.getBairro());
         comboTelefone.removeAllItems();
-        List<String> telefones = clienteDao.telefones(cliente);
+        List<String> telefones = fornecedorDao.telefones(fornecedor);
         if (!telefones.isEmpty()) {
             telefones.forEach(s -> comboTelefone.addItem(s));
         } else {
@@ -206,7 +200,7 @@ public class DialogCliente extends javax.swing.JDialog {
         Object selectedItem = comboBairro.getSelectedItem();
         comboBairro.removeAllItems();
         comboBairro.addItem("");
-        List<String> bairros = clienteDao.bairros(comboCidade.getSelectedItem().toString());
+        List<String> bairros = fornecedorDao.bairros(comboCidade.getSelectedItem().toString());
         if (!bairros.isEmpty()) {
             bairros.forEach(s -> comboBairro.addItem(s));
         }
@@ -214,7 +208,7 @@ public class DialogCliente extends javax.swing.JDialog {
         selectedItem = comboCidade.getSelectedItem();
         comboCidade.removeAllItems();
         comboCidade.addItem("");
-        List<String> cidades = clienteDao.cidades(comboEstado.getSelectedItem().toString());
+        List<String> cidades = fornecedorDao.cidades(comboEstado.getSelectedItem().toString());
         if (!cidades.isEmpty()) {
             cidades.forEach(s -> comboCidade.addItem(s));
         }
@@ -223,23 +217,23 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private boolean validaCampos() {
         if (campoNome.getText().equals("") || campoEndereco.getText().equals("")
-                || campoRg.getText().equals("") || campoCpf.getText().equals("")
-                || comboEstado.getSelectedItem().equals("") || comboCidade.getSelectedItem().equals("")
-                || comboBairro.getSelectedItem().equals("")) {
+                || campoCnpj.getText().equals("") || comboEstado.getSelectedItem().equals("") 
+                || comboCidade.getSelectedItem().equals("") || comboBairro.getSelectedItem().equals("")) {
+            System.out.println(campoCnpj.getValue());
             JOptionPane.showMessageDialog(this, "Confira os dados selecionados, registro incompleto", "Resgisto incompleto", JOptionPane.WARNING_MESSAGE);
             return false;
         }
         return true;
     }
 
-    private Cliente colectaCampos() {
+    private Fornecedor colectaCampos() {
         int id = 0;
         if(!modeloTabela.isEmpty()){
             id = modeloTabela.get(current).getId(); 
         }
-        return new Cliente(id, campoNome.getText(), campoEndereco.getText(),
-                campoRg.getText(), campoCpf.getText(), comboBairro.getSelectedItem().toString(),
-                comboCidade.getSelectedItem().toString(), comboEstado.getSelectedItem().toString());
+        System.out.println(current);
+        return new Fornecedor(id, campoNome.getText(), campoCnpj.getText(), campoEndereco.getText(),
+                comboBairro.getSelectedItem().toString(), comboCidade.getSelectedItem().toString(), comboEstado.getSelectedItem().toString());
     }
 
     private List<String> getComboTelefones() {
@@ -271,10 +265,8 @@ public class DialogCliente extends javax.swing.JDialog {
         botaoNovoTelefone = new javax.swing.JButton();
         labelEndereco = new javax.swing.JLabel();
         campoEndereco = new javax.swing.JTextField();
-        labelRg = new javax.swing.JLabel();
-        campoRg = new javax.swing.JTextField();
         labelCpf = new javax.swing.JLabel();
-        campoCpf = new javax.swing.JFormattedTextField();
+        campoCnpj = new javax.swing.JFormattedTextField();
         labelBairro = new javax.swing.JLabel();
         comboBairro = new javax.swing.JComboBox<>();
         botaoNovoBairro = new javax.swing.JButton();
@@ -326,18 +318,14 @@ public class DialogCliente extends javax.swing.JDialog {
 
         campoEndereco.setEnabled(false);
 
-        labelRg.setText("RG:");
-
-        campoRg.setEnabled(false);
-
-        labelCpf.setText("CPF:");
+        labelCpf.setText("CNPJ");
 
         try {
-            campoCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
+            campoCnpj.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.###.###/####-##")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
-        campoCpf.setEnabled(false);
+        campoCnpj.setEnabled(false);
 
         labelBairro.setText("Bairro:");
 
@@ -503,73 +491,67 @@ public class DialogCliente extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(labelNome)
-                                .addComponent(labelEndereco))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(campoEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(labelRg, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(labelEstado, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(comboEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(botaoNovoEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(campoRg))
-                            .addGap(11, 11, 11)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(labelCpf, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(labelCidade, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(comboCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(botaoNovoCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(campoCpf))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(labelTel, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(labelBairro, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(comboTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(botaoNovoTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(comboBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(botaoNovoBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(163, 163, 163)
-                            .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(27, 27, 27)
-                            .addComponent(botaoPrimeiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(botaoUltimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(24, 24, 24)
-                            .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(0, 9, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelNome)
+                            .addComponent(labelEndereco))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(campoEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelEstado)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoNovoEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(11, 11, 11)
+                                .addComponent(labelCidade)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoNovoCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelBairro)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoNovoBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(59, 59, 59)
+                                .addComponent(labelCpf)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(campoCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(labelTel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(comboTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoNovoTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGap(163, 163, 163)
+                        .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(botaoPrimeiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(botaoUltimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
+                        .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 11, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -578,10 +560,8 @@ public class DialogCliente extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(labelNome)
                     .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelRg)
-                    .addComponent(campoRg, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelCpf)
-                    .addComponent(campoCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(campoCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelTel)
                     .addComponent(comboTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoNovoTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -643,15 +623,15 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private void botaoSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvaActionPerformed
         if (validaCampos()) {
-            Cliente cliente = colectaCampos();
+            Fornecedor fornecedor = colectaCampos();
             if (modo == INSERT) {
                 List<String> telefones = getComboTelefones();
-                int id = clienteDao.save(cliente, telefones);
-                cliente.setId(id);
-                modeloTabela.add(cliente);
+                int id = fornecedorDao.save(fornecedor, telefones);
+                fornecedor.setId(id);
+                modeloTabela.add(fornecedor);
             } else if (modo == UPDATE) {
-                clienteDao.update(cliente);
-                modeloTabela.setValueAt(cliente, current);
+                fornecedorDao.update(fornecedor);
+                modeloTabela.setValueAt(fornecedor, current);
             }
             setModo(QWERY);
             resetaCampos();
@@ -674,7 +654,7 @@ public class DialogCliente extends javax.swing.JDialog {
             int opcao = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja apagar " + campoNome.getText() + " ?",
                     "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (opcao == JOptionPane.YES_OPTION) {
-                clienteDao.delete(modeloTabela.get(current).getId());
+                fornecedorDao.delete(modeloTabela.get(current).getId());
                 modeloTabela.remove(current);
             }
         }
@@ -722,13 +702,13 @@ public class DialogCliente extends javax.swing.JDialog {
         if (modo == INSERT) {
             List<String> lista = getComboTelefones();
             comboTelefone.removeAllItems();
-            List<String> editTelefone = dialog.editTelefone("Novo Cliente", "Cliente", lista);
+            List<String> editTelefone = dialog.editTelefone("Novo Fornecedor", "Fornecedor", lista);
             editTelefone.forEach(t -> comboTelefone.addItem(t));
         } else {
-            dialog.editTelefone(modeloTabela.get(current).getNome(), "Cliente", null);
+            dialog.editTelefone(modeloTabela.get(current).getNome(), "Fornecedor", null);
             comboTelefone.removeAllItems();
-            Cliente cliente = modeloTabela.get(current);
-            List<String> telefones = clienteDao.telefones(cliente);
+            Fornecedor fornecedor = modeloTabela.get(current);
+            List<String> telefones = fornecedorDao.telefones(fornecedor);
             if (!telefones.isEmpty()) {
                 telefones.forEach(s -> comboTelefone.addItem(s));
             } else {
@@ -759,7 +739,7 @@ public class DialogCliente extends javax.swing.JDialog {
         comboBairro.setSelectedItem(bairro);
     }//GEN-LAST:event_botaoNovoBairroActionPerformed
 
-    private void tabelaClienteMouseClicked() {
+    private void tabelaFornecedorMouseClicked() {
         if (modo == QWERY) {
             setCurrent(tabelaCliente.getSelectedRow());
         }
@@ -770,7 +750,7 @@ public class DialogCliente extends javax.swing.JDialog {
             comboLock = true;
             comboCidade.removeAllItems();
             comboCidade.addItem("");
-            List<String> cidades = clienteDao.cidades(comboEstado.getSelectedItem().toString());
+            List<String> cidades = fornecedorDao.cidades(comboEstado.getSelectedItem().toString());
             if (!cidades.isEmpty()) {
                 cidades.forEach(s -> comboCidade.addItem(s));
             }
@@ -782,7 +762,7 @@ public class DialogCliente extends javax.swing.JDialog {
         if (modo != QWERY && !comboLock) {
             comboBairro.removeAllItems();
             comboBairro.addItem("");
-            List<String> bairros = clienteDao.bairros(comboCidade.getSelectedItem().toString());
+            List<String> bairros = fornecedorDao.bairros(comboCidade.getSelectedItem().toString());
             if (!bairros.isEmpty()) {
                 bairros.forEach(s -> comboBairro.addItem(s));
             }
@@ -806,20 +786,21 @@ public class DialogCliente extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogFornecedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogFornecedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogFornecedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogCliente.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DialogFornecedor.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DialogCliente dialog = new DialogCliente(new javax.swing.JFrame(), true);
+                DialogFornecedor dialog = new DialogFornecedor(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -846,10 +827,9 @@ public class DialogCliente extends javax.swing.JDialog {
     private javax.swing.JButton botaoSalva;
     private javax.swing.JButton botaoUltimo;
     private javax.swing.JButton botaoVolta;
-    private javax.swing.JFormattedTextField campoCpf;
+    private javax.swing.JFormattedTextField campoCnpj;
     private javax.swing.JTextField campoEndereco;
     private javax.swing.JTextField campoNome;
-    private javax.swing.JTextField campoRg;
     private javax.swing.JComboBox<String> comboBairro;
     private javax.swing.JComboBox<String> comboCidade;
     private javax.swing.JComboBox<String> comboEstado;
@@ -862,7 +842,6 @@ public class DialogCliente extends javax.swing.JDialog {
     private javax.swing.JLabel labelEndereco;
     private javax.swing.JLabel labelEstado;
     private javax.swing.JLabel labelNome;
-    private javax.swing.JLabel labelRg;
     private javax.swing.JLabel labelTel;
     private javax.swing.JTable tabelaCliente;
     // End of variables declaration//GEN-END:variables

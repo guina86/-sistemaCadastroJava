@@ -33,6 +33,7 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     private int current;
     private int modo;
     private boolean comboLock;
+    private String tipo;
 
     /**
      * Creates new form DialogTelefone
@@ -135,7 +136,7 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     }
 
     private boolean validaCampos() {
-        if (campoNumero.getValue() == null || comboNome.getSelectedItem().equals("")) {
+        if (campoNumero.getText().equals("") || comboNome.getSelectedItem().equals("")) {
             JOptionPane.showMessageDialog(this, "Confira os dados selecionados, registro incompleto", "Resgisto incompleto", JOptionPane.WARNING_MESSAGE);
             return false;
         }
@@ -331,6 +332,11 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
         grupoRadio.add(radioFornecedor);
         radioFornecedor.setText("Fornecedor");
+        radioFornecedor.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                radioFornecedorItemStateChanged(evt);
+            }
+        });
 
         labelNome.setText("Nome:");
 
@@ -439,7 +445,7 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
             if (modo == INSERT) {
                 Telefone telefone = new Telefone(campoNumero.getText());
-                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), radioCliente.isSelected());
+                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), tipo);
                 telefone.setId(id);
                 modeloTabela.add(telefone);
             } else if (modo == UPDATE) {
@@ -466,7 +472,7 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
         } else {
             int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNumero.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION) {
-                telefoneDao.delete(modeloTabela.get(current).getId());
+                telefoneDao.delete(modeloTabela.get(current).getId(), tipo);
                 modeloTabela.remove(current);
             }
         }
@@ -523,9 +529,17 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
     private void radioClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioClienteItemStateChanged
         if (radioCliente.isSelected()) {
+            tipo = "Cliente";
             reloadCombo();
         }
     }//GEN-LAST:event_radioClienteItemStateChanged
+
+    private void radioFornecedorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioFornecedorItemStateChanged
+        if (radioFornecedor.isSelected()) {
+            tipo = "Fornecedor";
+            reloadCombo();
+        }
+    }//GEN-LAST:event_radioFornecedorItemStateChanged
 
     public List<String> dialog(){
         setModo(DIALOG);
@@ -538,7 +552,7 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == comboNome) {
             modeloTabela.limpar();
-            modeloTabela.addLista(telefoneDao.numeros(comboNome.getSelectedItem().toString()));
+            modeloTabela.addLista(telefoneDao.numeros(comboNome.getSelectedItem().toString(), tipo));
             System.out.println(campoNumero.getText());
         }
     }

@@ -29,6 +29,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
     private static final int UPDATE = 2;
     private int current;
     private int modo;
+    private String tipo;
 
     /**
      * Creates new form DialogTelefone
@@ -324,8 +325,8 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         if (modo == INSERT) {
             if (campoNumero.getValue() != null) {
                 Telefone telefone = new Telefone(campoNumero.getText());
-                if (!campoNome.getText().equals("Novo Cliente")) {
-                    int id = telefoneDao.save(telefone, campoNome.getText(), true);
+                if (!campoNome.getText().equals("Novo Cliente") && !campoNome.getText().equals("Novo Fornecedor")) {
+                    int id = telefoneDao.save(telefone, campoNome.getText(), tipo);
                     telefone.setId(id);
                 }
                 modeloTabela.add(telefone);
@@ -334,7 +335,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
 
         } else if (modo == UPDATE) {
             Telefone telefone = new Telefone(modeloTabela.get(current).getId(), campoNumero.getText());
-            if (!campoNome.getText().equals("Novo Cliente")) {
+            if (!campoNome.getText().equals("Novo Cliente") && !campoNome.getText().equals("Novo Fornecedor")) {
                 telefoneDao.update(telefone);
             }
             modeloTabela.setValueAt(telefone, current);
@@ -358,7 +359,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
             int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNumero.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION) {
                 if (!campoNome.getText().equals("Novo Cliente")) {
-                    telefoneDao.delete(modeloTabela.get(current).getId());
+                    telefoneDao.delete(modeloTabela.get(current).getId(), tipo);
                 }
                 modeloTabela.remove(current);
             }
@@ -386,13 +387,14 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         // TODO add your handling code here:
     }//GEN-LAST:event_campoNumeroActionPerformed
 
-    public List<String> editTelefone(String nome, List<String> lista) {
+    public List<String> editTelefone(String nome,String tipo, List<String> lista) {
         campoNome.setText(nome);
-        if (!nome.equals("Novo Cliente")) {
-            modeloTabela.addLista(telefoneDao.numeros(nome));
-        } else {
+        if (nome.equals("Novo Cliente") || nome.equals("Novo Fornecedor")) {
             lista.forEach(s -> modeloTabela.add(new Telefone(s)));
+        } else{
+            modeloTabela.addLista(telefoneDao.numeros(nome, tipo));
         }
+        this.tipo = tipo;
         setVisible(true);
         return modeloTabela.getLista();
     }

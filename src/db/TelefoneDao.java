@@ -77,10 +77,10 @@ public class TelefoneDao implements Dao<Telefone> {
         return 0;
     }
 
-    public int save(Telefone telefone, String nome, boolean tipo) {
+    public int save(Telefone telefone, String nome, String tipo) {
         String sql1 = "INSERT INTO telefones (numero) VALUES (?)";
         String sql2 = "";
-        if (tipo) {
+        if (tipo.equals("Cliente")) {
             sql2 = "INSERT INTO telefone_cliente (id_telefone, id_cliente) VALUES (? , (SELECT id FROM clientes WHERE nome = ?))";
         } else {
             sql2 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (? , (SELECT id FROM fornecedores WHERE nome = ?))";
@@ -148,9 +148,14 @@ public class TelefoneDao implements Dao<Telefone> {
         }
     }
 
-    public void delete(int id) {
+    public void delete(int id, String tipo) {
         String sql1 = "DELETE FROM telefones WHERE id = ?";
-        String sql2 = "DELETE FROM telefone_cliente WHERE id_telefone = ?";
+        String sql2 = "";
+        if (tipo.equals("Cliente")) {
+            sql2 = "DELETE FROM telefone_cliente WHERE id_telefone = ?";
+        } else {
+            sql2 = "DELETE FROM telefone_fornecedor WHERE id_telefone = ?";
+        }
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps1 = conn.prepareStatement(sql1);
                 PreparedStatement ps2 = conn.prepareStatement(sql2)) {
@@ -180,7 +185,7 @@ public class TelefoneDao implements Dao<Telefone> {
         }
         return null;
     }
-    
+
     public List<String> fornecedores() {
         String sql = "SELECT nome FROM fornecedores";
         try (Connection conn = ConectaBanco.getConexao();
@@ -197,9 +202,15 @@ public class TelefoneDao implements Dao<Telefone> {
         return null;
     }
 
-    public List<Telefone> numeros(String nome) {
-        String sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_cliente as tc ON t.id = tc.id_telefone "
-                + "JOIN clientes as c ON tc.id_cliente = c.id WHERE c.nome = ?";
+    public List<Telefone> numeros(String nome, String tipo) {
+        String sql = "";
+        if (tipo.equals("Cliente")) {
+            sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_cliente as tc ON t.id = tc.id_telefone "
+                    + "JOIN clientes as c ON tc.id_cliente = c.id WHERE c.nome = ?";
+        } else {
+            sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_fornecedor as tc ON t.id = tc.id_telefone "
+                    + "JOIN fornecedor as f ON tc.id_cliente = f.id WHERE f.nome = ?";
+        }
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, nome);
@@ -214,5 +225,6 @@ public class TelefoneDao implements Dao<Telefone> {
         }
         return null;
     }
+
 
 }
