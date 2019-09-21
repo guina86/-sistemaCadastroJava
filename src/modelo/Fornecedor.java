@@ -5,6 +5,8 @@
  */
 package modelo;
 
+import java.util.List;
+
 /**
  *
  * @author Leandro Guina
@@ -15,31 +17,37 @@ public class Fornecedor {
     private String nome;
     private String cnpj;
     private String endereco;
-    private String bairro;
-    private String cidade;
-    private String estado;
+    private Bairro bairro;
+    private List<Telefone> telefones;
 
     public Fornecedor() {
     }
 
-    public Fornecedor(String nome, String cnpj, String endereco, String bairro, String cidade, String estado) {
+    public Fornecedor(String nome, String cnpj, String endereco, Bairro bairro) {
         this.nome = nome;
         this.cnpj = cnpj;
         this.endereco = endereco;
         this.bairro = bairro;
-        this.cidade = cidade;
-        this.estado = estado;
     }
 
-    public Fornecedor(Integer id, String nome, String cnpj, String endereco, String bairro, String cidade, String estado) {
+    public Fornecedor(String nome, String cnpj, String endereco, Bairro bairro, List<Telefone> telefones) {
+        this.nome = nome;
+        this.cnpj = cnpj;
+        this.endereco = endereco;
+        this.bairro = bairro;
+        this.telefones = telefones;
+    }
+  
+    public Fornecedor(Integer id, String nome, String cnpj, String endereco, Bairro bairro, List<Telefone> telefones) {
         this.id = id;
         this.nome = nome;
         this.cnpj = cnpj;
         this.endereco = endereco;
         this.bairro = bairro;
-        this.cidade = cidade;
-        this.estado = estado;
+        this.telefones = telefones;
     }
+    
+    
 
     public Integer getId() {
         return id;
@@ -73,34 +81,29 @@ public class Fornecedor {
         this.endereco = endereco;
     }
 
-    public String getBairro() {
+    public Bairro getBairro() {
         return bairro;
     }
 
-    public void setBairro(String bairro) {
+    public void setBairro(Bairro bairro) {
         this.bairro = bairro;
     }
 
-    public String getCidade() {
-        return cidade;
+    public List<Telefone> getTelefones() {
+        return telefones;
     }
 
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setTelefones(List<Telefone> telefones) {
+        this.telefones = telefones;
     }
 
     @Override
     public String toString() {
-        return "Fornecedor{" + "id=" + id + ", nome=" + nome + ", cnpj=" + cnpj + ", endereco=" + endereco + ", bairro=" + bairro + ", cidade=" + cidade + ", estado=" + estado + '}';
+        return "Fornecedor{" + "id=" + id + ", nome=" + nome + ", cnpj=" + cnpj + ", endereco=" + endereco + ", bairro=" + bairro + ", telefones=" + telefones + '}';
     }
+
     
+
+  
     
 }

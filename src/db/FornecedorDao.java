@@ -8,7 +8,11 @@ package db;
 import java.util.List;
 import java.sql.*;
 import java.util.ArrayList;
+import modelo.Bairro;
+import modelo.Cidade;
+import modelo.Estado;
 import modelo.Fornecedor;
+import modelo.Telefone;
 import utilitarios.ConectaBanco;
 
 /**
@@ -17,25 +21,36 @@ import utilitarios.ConectaBanco;
  */
 public class FornecedorDao implements Dao<Fornecedor> {
 
-
     public FornecedorDao() {
 
     }
 
     @Override
     public Fornecedor get(Integer id) {
-        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.nome AS bairro, c.nome AS cidade, e.nome AS estado "
+        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.id AS id_bairro, c.id AS id_cidade, e.id AS id_estado, b.nome AS bairro, c.nome AS cidade, e.nome AS estado, e.sigla "
                 + "FROM fornecedores f JOIN bairros b ON f.id_bairro = b.id "
-                + "JOIN cidades c ON f.id_cidade = c.id "
-                + "JOIN estados e ON f.id_estado = e.id "
+                + "JOIN cidades c ON b.id_cidade = c.id "
+                + "JOIN estados e ON c.id_estado = e.id "
                 + "WHERE f.id = ?";
+        String sql2 = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ?";
         try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps2 = conn.prepareStatement(sql2)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             Fornecedor fornecedor = null;
             if (rs.next()) {
-                fornecedor = new Fornecedor(rs.getInt("id"), rs.getString("nome"),rs.getString("cnpj"), rs.getString("endereco"), rs.getString("bairro"), rs.getString("cidade"), rs.getString("estado"));
+                ps2.setInt(1, id);
+                ResultSet rs2 = ps2.executeQuery();
+                List<Telefone> telefones = new ArrayList<>();
+                while(rs2.next()){
+                    telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
+                }
+                Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
+                Cidade cidade = new Cidade(rs.getInt("id_cidade"), rs.getString("cidade"), estado);
+                Bairro bairro = new Bairro(rs.getInt("id_bairro"), rs.getString("bairro"), cidade);
+                fornecedor = new Fornecedor(rs.getInt("id"), rs.getString("nome"), rs.getString("cnpj"), rs.getString("endereco"), bairro, telefones);
+                rs2.close();
             }
             rs.close();
             return fornecedor;
@@ -47,19 +62,30 @@ public class FornecedorDao implements Dao<Fornecedor> {
 
     @Override
     public List<Fornecedor> getAll() {
-        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.nome AS bairro, c.nome AS cidade, e.nome AS estado "
+        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.id AS id_bairro, c.id AS id_cidade, e.id AS id_estado, b.nome AS bairro, c.nome AS cidade, e.nome AS estado, e.sigla "
                 + "FROM fornecedores f JOIN bairros b ON f.id_bairro = b.id "
-                + "JOIN cidades c ON f.id_cidade = c.id "
-                + "JOIN estados e ON f.id_estado = e.id ";
+                + "JOIN cidades c ON b.id_cidade = c.id "
+                + "JOIN estados e ON c.id_estado = e.id ";
+        String sql2 = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ?";
         try (Connection conn = ConectaBanco.getConexao();
+                PreparedStatement ps = conn.prepareStatement(sql2);
                 Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<Fornecedor> lista = new ArrayList<>();
+                ResultSet rs = st.executeQuery(sql)){
+            List<Fornecedor> fornecedores = new ArrayList<>();
             while (rs.next()) {
-                Fornecedor fornecedor = new Fornecedor(rs.getInt("id"), rs.getString("nome"),rs.getString("cnpj"), rs.getString("endereco"), rs.getString("bairro"), rs.getString("cidade"), rs.getString("estado"));
-                lista.add(fornecedor);
+                ps.setInt(1, rs.getInt("id"));
+                ResultSet rs2 = ps.executeQuery();
+                List<Telefone> telefones = new ArrayList<>();
+                while(rs2.next()){
+                    telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
+                }
+                Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
+                Cidade cidade = new Cidade(rs.getInt("id_cidade"), rs.getString("cidade"), estado);
+                Bairro bairro = new Bairro(rs.getInt("id_bairro"), rs.getString("bairro"), cidade);
+                fornecedores.add(new Fornecedor(rs.getInt("id"), rs.getString("nome"), rs.getString("cnpj"), rs.getString("endereco"), bairro, telefones));
+                rs2.close();
             }
-            return lista;
+            return fornecedores;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,35 +94,51 @@ public class FornecedorDao implements Dao<Fornecedor> {
 
     @Override
     public int save(Fornecedor fornecedor) {
-        String sql = "INSERT INTO fornecedores (nome, cnpj, endereco, id_bairro, id_cidade, id_estado) "
-                + "VALUES (?, ?, ?,(SELECT id FROM bairros WHERE nome = ?), "
-                + "(SELECT id FROM cidades WHERE nome = ?), "
-                + "(SELECT id FROM estados WHERE nome = ?))";
+        String sql = "INSERT INTO fornecedores (nome, cnpj, endereco, id_bairro) VALUES (?, ?, ?, ?)";
+        String sql2 = "INSERT INTO telefones (numero) VALUES (?)";
+        String sql3 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (? , ?)";
         try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps3 = conn.prepareStatement(sql3)){
+            conn.setAutoCommit(false);
             ps.setString(1, fornecedor.getNome());
             ps.setString(2, fornecedor.getCnpj());
             ps.setString(3, fornecedor.getEndereco());
-            ps.setString(4, fornecedor.getBairro());
-            ps.setString(5, fornecedor.getCidade());
-            ps.setString(6, fornecedor.getEstado());
+            ps.setInt(4, fornecedor.getBairro().getId());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
+            int id = 0;
             if (rs.next()) {
-                return rs.getInt(1);
+                id =  rs.getInt(1);
             }
             rs.close();
+            if(!fornecedor.getTelefones().isEmpty()){
+                for(Telefone telefone : fornecedor.getTelefones()){
+                    ps2.setString(1, telefone.getNumero());
+                    ps2.executeUpdate();
+                    ResultSet rs2 = ps2.getGeneratedKeys();
+                    int idTel = 0;
+                    if(rs.next()){
+                        idTel = rs2.getInt(1);
+                    }
+                    ps3.setInt(1, idTel);
+                    ps3.setInt(2, id);
+                    ps3.executeUpdate();
+                    rs2.close();
+                }
+            }
+            conn.commit();
+            conn.setAutoCommit(true);
+            return id;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
-    
+
     public int save(Fornecedor fornecedor, List<String> telefones) {
-        String sql = "INSERT INTO fornecedores (nome, cnpj, endereco, id_bairro, id_cidade, id_estado) "
-                + "VALUES (?, ?, ?,(SELECT id FROM bairros WHERE nome = ?), "
-                + "(SELECT id FROM cidades WHERE nome = ?), "
-                + "(SELECT id FROM estados WHERE nome = ?))";
+        String sql = "INSERT INTO fornecedores (nome, cnpj, endereco, id_bairro) VALUES (?, ?, ?, ?)";
         String sql2 = "INSERT INTO telefones (numero) VALUES (?)";
         String sql3 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (? , ?)";
         try (Connection conn = ConectaBanco.getConexao();
@@ -107,22 +149,20 @@ public class FornecedorDao implements Dao<Fornecedor> {
             ps.setString(1, fornecedor.getNome());
             ps.setString(2, fornecedor.getCnpj());
             ps.setString(3, fornecedor.getEndereco());
-            ps.setString(4, fornecedor.getBairro());
-            ps.setString(5, fornecedor.getCidade());
-            ps.setString(6, fornecedor.getEstado());
+            ps.setString(4, fornecedor.getBairro().getNome());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             int id = 0;
             if (rs.next()) {
-                 id = rs.getInt(1);
+                id = rs.getInt(1);
             }
             rs.close();
-            for(String telefone : telefones){
+            for (String telefone : telefones) {
                 ps2.setString(1, telefone);
                 ps2.executeUpdate();
                 ResultSet rs2 = ps2.getGeneratedKeys();
                 int idTel = 0;
-                if(rs2.next()){
+                if (rs2.next()) {
                     idTel = rs2.getInt(1);
                 }
                 ps3.setInt(1, idTel);
@@ -141,20 +181,14 @@ public class FornecedorDao implements Dao<Fornecedor> {
 
     @Override
     public void update(Fornecedor fornecedor) {
-        String sql = "UPDATE fornecedores SET nome = ?, cnpj = ?, endereco = ?, "
-                + "id_bairro = (SELECT id FROM bairros WHERE nome = ?), "
-                + "id_cidade = (SELECT id FROM cidades WHERE nome = ?), "
-                + "id_estado = (SELECT id FROM estados WHERE nome = ?) "
-                + "WHERE id = ?";
+        String sql = "UPDATE fornecedores SET nome = ?, cnpj = ?, endereco = ?, id_bairro = ? WHERE id = ?";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fornecedor.getNome());
             ps.setString(2, fornecedor.getCnpj());
             ps.setString(3, fornecedor.getEndereco());
-            ps.setString(4, fornecedor.getBairro());
-            ps.setString(5, fornecedor.getCidade());
-            ps.setString(6, fornecedor.getEstado());
-            ps.setInt(7, fornecedor.getId());
+            ps.setInt(4, fornecedor.getBairro().getId());
+            ps.setInt(5, fornecedor.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -165,10 +199,22 @@ public class FornecedorDao implements Dao<Fornecedor> {
     @Override
     public void delete(Fornecedor fornecedor) {
         String sql = "DELETE FROM fornecedores WHERE id = ?";
+        String sql2 = "DELETE FROM telefones WHERE id = ?";
+        String sql3 = "DELETE FROM  telefone_fornecedor WHERE id_fornecedor = ?";
         try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps2 = conn.prepareStatement(sql2);
+                PreparedStatement ps3 = conn.prepareStatement(sql3)) {
             ps.setInt(1, fornecedor.getId());
             ps.executeUpdate();
+            if(!fornecedor.getTelefones().isEmpty()){
+                for (Telefone telefone : fornecedor.getTelefones()) {
+                    ps2.setInt(1, telefone.getId());
+                    ps2.executeUpdate();
+                }
+                ps3.setInt(1, fornecedor.getId());
+                ps3.executeUpdate();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -185,14 +231,14 @@ public class FornecedorDao implements Dao<Fornecedor> {
         }
     }
 
-    public List<String> telefones() {
-        String sql = "SELECT numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone ORDER BY numero";
+    public List<Telefone> telefones() {
+        String sql = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone ORDER BY numero";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
+            List<Telefone> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("numero"));
+                lista.add(new Telefone(rs.getInt("id"),rs.getString("numero")));
             }
             return lista;
         } catch (SQLException e) {
@@ -200,7 +246,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
         }
         return null;
     }
-    
+
     public List<String> telefones(Fornecedor fornecedor) {
         String sql = "SELECT numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ? ORDER BY numero";
         try (Connection conn = ConectaBanco.getConexao();
@@ -219,7 +265,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
         return null;
     }
 
-    public List<String> bairros(){
+    public List<String> bairros() {
         String sql = "SELECT nome FROM bairros ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
@@ -233,18 +279,18 @@ public class FornecedorDao implements Dao<Fornecedor> {
             e.printStackTrace();
         }
         return null;
-        
+
     }
-    
-    public List<String> bairros(String cidade){
-        String sql = "SELECT nome FROM bairros WHERE id_cidade = (SELECT id FROM cidades WHERE nome = ?) ORDER BY nome";
+
+    public List<Bairro> bairros(Cidade cidade) {
+        String sql = "SELECT * FROM bairros WHERE id_cidade = ? ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, cidade);
+            ps.setInt(1, cidade.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Bairro> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Bairro(rs.getInt("id"), rs.getString("nome"), cidade));
             }
             rs.close();
             return lista;
@@ -252,11 +298,10 @@ public class FornecedorDao implements Dao<Fornecedor> {
             e.printStackTrace();
         }
         return null;
-        
+
     }
-    
-    
-    public List<String> cidades(){
+
+    public List<String> cidades() {
         String sql = "SELECT nome FROM cidades ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
@@ -270,19 +315,18 @@ public class FornecedorDao implements Dao<Fornecedor> {
             e.printStackTrace();
         }
         return null;
-        
+
     }
-    
-    
-    public List<String> cidades(String estado){
-        String sql = "SELECT nome FROM cidades WHERE id_estado = (SELECT id FROM estados WHERE nome = ?) ORDER BY nome";
+
+    public List<Cidade> cidades(Estado estado) {
+        String sql = "SELECT * FROM cidades WHERE id_estado = ? ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, estado);
+            ps.setInt(1, estado.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Cidade> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Cidade(rs.getInt("id"), rs.getString("nome"), estado));
             }
             rs.close();
             return lista;
@@ -290,25 +334,24 @@ public class FornecedorDao implements Dao<Fornecedor> {
             e.printStackTrace();
         }
         return null;
-        
+
     }
-    
-    
-    public List<String> estados(){
-        String sql = "SELECT nome FROM estados ORDER BY nome";
+
+    public List<Estado> estados() {
+        String sql = "SELECT * FROM estados ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
+            List<Estado> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Estado(rs.getInt("id"), rs.getString("nome"), rs.getString("sigla")));
             }
             return lista;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
-        
+
     }
 
 }

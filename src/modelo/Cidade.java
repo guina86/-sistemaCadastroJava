@@ -5,6 +5,8 @@
  */
 package modelo;
 
+import java.util.Objects;
+
 /**
  *
  * @author Leandro Guina
@@ -12,17 +14,17 @@ package modelo;
 public class Cidade {
     private Integer id;
     private String nome;
-    private String estado;
+    private Estado estado;
 
     public Cidade() {
     }
 
-    public Cidade(String nome, String estado) {
+    public Cidade(String nome, Estado estado) {
         this.nome = nome;
         this.estado = estado;
     }
 
-    public Cidade(Integer id, String nome, String estado) {
+    public Cidade(Integer id, String nome, Estado estado) {
         this.id = id;
         this.nome = nome;
         this.estado = estado;
@@ -44,17 +46,44 @@ public class Cidade {
         this.nome = nome;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cidade other = (Cidade) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+
+    @Override
     public String toString() {
-        return "Cidade{" + "id=" + id + ", nome=" + nome + ", estado=" + estado + '}';
+        return getNome();
     }
 
     

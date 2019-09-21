@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package view;
 
 import db.CidadeDao;
@@ -12,7 +11,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import modelo.Cidade;
+import modelo.Estado;
 import utilitarios.CidadeTM;
+import utilitarios.DefaultCM;
 
 /**
  *
@@ -21,36 +22,73 @@ import utilitarios.CidadeTM;
 public class DialogCidade extends javax.swing.JDialog {
 
     private final CidadeDao cidadeDao;
-    private int current;
-    private String modoEdicao;
     private final CidadeTM modeloTabela;
+    private final DefaultCM<Estado> modeloCombo;
+    private static final int QWERY = 0;
+    private static final int INSERT = 1;
+    private static final int UPDATE = 2;
+    private int current;
+    private int modo;
     
-    /** Creates new form DialogCidade */
-    public DialogCidade() {
-        cidadeDao = new CidadeDao();
-        modeloTabela = new CidadeTM(cidadeDao.getAll());
-        initComponents();
-        inicializa();
-    }
+
+    /**
+     * Creates new form DialogCidade
+     */
     
     public DialogCidade(Frame owner, boolean modal) {
         super(owner, modal);
         cidadeDao = new CidadeDao();
-        modeloTabela = new CidadeTM(cidadeDao.getAll());
+        modeloTabela = new CidadeTM();
+        modeloCombo = new DefaultCM<>();
         initComponents();
         inicializa();
     }
-    
-    private void inicializa(){
-        current = 0;
-        modoEdicao = "";
-        preencherTabela();
-        preencherComboEstado();
-    }
-        
 
-    private void setInterface(boolean nome, boolean estado, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela, boolean limpaCampos) {
-        limpaCampos(limpaCampos);
+    private void inicializa() {
+        // variaveis globais
+        current = 0;
+        modo = QWERY;
+        
+        // comboBox
+        comboEstado.setModel(modeloCombo);
+        preencheComboEstado();
+        
+        // tabela
+        tabelaCidade.setModel(modeloTabela);
+        tabelaCidade.getColumnModel().getColumn(0).setPreferredWidth(40);
+        tabelaCidade.getColumnModel().getColumn(0).setResizable(false);
+        tabelaCidade.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tabelaCidade.getColumnModel().getColumn(1).setResizable(false);
+        tabelaCidade.getColumnModel().getColumn(2).setPreferredWidth(200);
+        tabelaCidade.getColumnModel().getColumn(2).setResizable(false);
+        tabelaCidade.getTableHeader().setReorderingAllowed(false);
+        tabelaCidade.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabelaCidade.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    }
+
+    private void setModo(int modo) {
+        switch (modo) {
+            case QWERY:
+                this.modo = modo;
+                setInterface(false, true, true, false, true, true, true, false, true);
+                break;
+            case INSERT:
+                this.modo = modo;
+                setInterface(true, true, false, true, false, false, false, true, false);
+                campoNome.setText("");
+                campoNome.requestFocus();
+                break;
+            case UPDATE:
+                this.modo = modo;
+                setInterface(true, false, false, true, false, false, false, true, false);
+                campoNome.requestFocus();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setInterface(boolean nome, boolean estado, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela) {
         campoNome.setEnabled(nome);
         comboEstado.setEnabled(estado);
         botaoSalva.setEnabled(salva);
@@ -63,58 +101,53 @@ public class DialogCidade extends javax.swing.JDialog {
         botaoProximo.setEnabled(navegacao);
         botaoUltimo.setEnabled(navegacao);
         tabelaCidade.setRowSelectionAllowed(tabela);
+        tabelaCidade.setFocusable(tabela);
     }
 
-    private void preencherComboEstado(){
-        comboEstado.removeAllItems();
-        comboEstado.addItem("");
-        cidadeDao.estados().forEach(s-> comboEstado.addItem(s));
+    private void setCurrent(int current) {
+        this.current = current;
+        preencheCampos();
     }
-    
-    private void preencherCampos(Cidade cidade) {
-        campoId.setText(cidade.getId().toString());
+
+    private void preencheComboEstado() {
+        modeloCombo.setSelectedItem(null);
+        modeloCombo.addAll(cidadeDao.estados());
+    }
+
+    private void preencheCampos() {
+        Cidade cidade = modeloTabela.get(current);
         campoNome.setText(cidade.getNome());
-        comboEstado.setSelectedItem(cidade.getEstado());
+        modeloCombo.setSelectedItem(cidade.getEstado());
     }
 
-    private void limpaCampos(boolean opcao) {
-        if (opcao) {
-            campoId.setText("");
-            campoNome.setText("");
-            comboEstado.setSelectedIndex(0);
-            tabelaCidade.clearSelection();
+    private boolean validaCampos() {
+        if (campoNome.getText().equals("") || modeloCombo.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Confira os dados selecionados, registro incompleto", "Resgisto incompleto", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
+        return true;
     }
 
-    private void preencherTabela() {
-        tabelaCidade.setModel(modeloTabela);
-        tabelaCidade.getColumnModel().getColumn(0).setPreferredWidth(40);
-        tabelaCidade.getColumnModel().getColumn(0).setResizable(false);
-        tabelaCidade.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tabelaCidade.getColumnModel().getColumn(1).setResizable(false);
-        tabelaCidade.getColumnModel().getColumn(2).setPreferredWidth(200);
-        tabelaCidade.getColumnModel().getColumn(2).setResizable(false);
-        tabelaCidade.getTableHeader().setReorderingAllowed(false);
-        tabelaCidade.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tabelaCidade.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabelaCidade.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
+    private Cidade colectaCampos() {
+        int id = 0;
+        if (!modeloTabela.isEmpty()) {
+            id = modeloTabela.get(current).getId();
+        }
+        return new Cidade(id, campoNome.getText(), modeloCombo.getSelectedItem());
     }
-    
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        campoId = new javax.swing.JTextField();
+        labelNome = new javax.swing.JLabel();
+        labelEstado = new javax.swing.JLabel();
         campoNome = new javax.swing.JTextField();
         botaoNovo = new javax.swing.JButton();
         botaoSalva = new javax.swing.JButton();
@@ -136,15 +169,9 @@ public class DialogCidade extends javax.swing.JDialog {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Formulário de cadastro de cidades", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
 
-        jLabel1.setText("Id:");
+        labelNome.setText("Nome:");
 
-        jLabel2.setText("Nome:");
-
-        jLabel3.setText("Estado:");
-
-        campoId.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        campoId.setEnabled(false);
-        campoId.setMinimumSize(new java.awt.Dimension(7, 22));
+        labelEstado.setText("Estado:");
 
         campoNome.setDisabledTextColor(new java.awt.Color(0, 0, 0));
         campoNome.setEnabled(false);
@@ -174,7 +201,6 @@ public class DialogCidade extends javax.swing.JDialog {
 
         botaoEdita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edit_36p.png"))); // NOI18N
         botaoEdita.setToolTipText("Editar");
-        botaoEdita.setEnabled(false);
         botaoEdita.setMaximumSize(new java.awt.Dimension(50, 50));
         botaoEdita.setMinimumSize(new java.awt.Dimension(50, 50));
         botaoEdita.setPreferredSize(new java.awt.Dimension(50, 50));
@@ -186,7 +212,6 @@ public class DialogCidade extends javax.swing.JDialog {
 
         botaoApaga.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/delete_36p.png"))); // NOI18N
         botaoApaga.setToolTipText("Apagar");
-        botaoApaga.setEnabled(false);
         botaoApaga.setMaximumSize(new java.awt.Dimension(50, 50));
         botaoApaga.setMinimumSize(new java.awt.Dimension(50, 50));
         botaoApaga.setPreferredSize(new java.awt.Dimension(50, 50));
@@ -281,7 +306,6 @@ public class DialogCidade extends javax.swing.JDialog {
             }
         });
 
-        comboEstado.setEnabled(false);
         comboEstado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboEstadoActionPerformed(evt);
@@ -324,15 +348,11 @@ public class DialogCidade extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(botaoUltimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(labelNome)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(campoId, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel3)
+                        .addComponent(labelEstado)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(comboEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -344,13 +364,9 @@ public class DialogCidade extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel1)
-                    .addComponent(campoId, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel2)
+                    .addComponent(labelNome)
                     .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
+                    .addComponent(labelEstado)
                     .addComponent(comboEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoNovoEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -394,45 +410,41 @@ public class DialogCidade extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoActionPerformed
-        modoEdicao = "salvar";
-        preencherComboEstado();
-        tabelaCidade.setRowSelectionAllowed(false);
-        setInterface(true, true, false, true, false, false, false, true, false, true);
-        campoNome.requestFocus();
+        setModo(INSERT);
     }//GEN-LAST:event_botaoNovoActionPerformed
 
     private void botaoSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvaActionPerformed
-        if (modoEdicao.equals("salvar")) {
-            Cidade cidade = new Cidade(campoNome.getText(), comboEstado.getSelectedItem().toString());
-            int id = cidadeDao.save(cidade);
-            cidade.setId(id);
-            modeloTabela.add(cidade);
-            current = modeloTabela.getRowCount() -1;
-        } else if (modoEdicao.equals("update")) {
-            Cidade cidade = new Cidade(Integer.valueOf(campoId.getText()), campoNome.getText(), comboEstado.getSelectedItem().toString());
-            cidadeDao.update(cidade);
-            modeloTabela.setValueAt(cidade, current);
+        if (validaCampos()) {
+            Cidade cidade = colectaCampos();
+            if (modo == INSERT) {
+                int id = cidadeDao.save(cidade);
+                cidade.setId(id);
+                modeloTabela.add(cidade);
+                setCurrent(modeloTabela.getRowCount() - 1);
+                tabelaCidade.setRowSelectionInterval(current, current);
+            } else if (modo == UPDATE) {
+                cidadeDao.update(cidade);
+                modeloTabela.setValueAt(cidade, current);
+            }
+            setModo(QWERY);
         }
-        setInterface(false, false, true, false, false, false, true, false, true, true);
     }//GEN-LAST:event_botaoSalvaActionPerformed
 
     private void botaoEditaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEditaActionPerformed
-        modoEdicao = "update";
-        Object o = comboEstado.getSelectedItem();
-        preencherComboEstado();
-        comboEstado.setSelectedItem(o);
-        setInterface(true, true, false, true, false, false, false, true, true, false);
-        campoNome.requestFocus();
+        if (tabelaCidade.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            setModo(UPDATE);
+        }
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
-        if (option == 0) {
-            int id = Integer.parseInt(campoId.getText());
-            cidadeDao.delete(id);
+        int opcao = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
+        if (opcao == JOptionPane.YES_OPTION) {
+            cidadeDao.delete(modeloTabela.get(current));
             modeloTabela.remove(current);
+            campoNome.setText("");
         }
-        setInterface(false, false, true, false, false, false, true, false, true, true);
     }//GEN-LAST:event_botaoApagaActionPerformed
 
     private void botaoVoltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoVoltaActionPerformed
@@ -440,70 +452,70 @@ public class DialogCidade extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoVoltaActionPerformed
 
     private void tabelaCidadeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaCidadeMouseClicked
-        current = tabelaCidade.getSelectedRow();
-        Cidade cidade = modeloTabela.get(current);
-        preencherCampos(cidade);
-        setInterface(false, false, true, false, true, true, true, false, true, false);
+        if (modo == QWERY) {
+            setCurrent(tabelaCidade.getSelectedRow());
+        }
     }//GEN-LAST:event_tabelaCidadeMouseClicked
 
     private void botaoPrimeiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoPrimeiroActionPerformed
-        current = 0;
+        setCurrent(0);
         tabelaCidade.setRowSelectionInterval(current, current);
-        Cidade cidade = modeloTabela.get(0);
-        preencherCampos(cidade);
-        setInterface(false, false, true, false, true, true, true, false, true, false);
     }//GEN-LAST:event_botaoPrimeiroActionPerformed
 
     private void botaoProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoProximoActionPerformed
         int size = modeloTabela.getRowCount();
-        if (campoId.getText().equals("")) {
-            current = 0;
+        if (tabelaCidade.getSelectedRow() == -1) {
+            setCurrent(0);
         } else if (size > 1 && current < size - 1) {
-            current++;
+            setCurrent(current + 1);
         }
         tabelaCidade.setRowSelectionInterval(current, current);
-        Cidade cidade = modeloTabela.get(current);
-        preencherCampos(cidade);
-        setInterface(false, false, true, false, true, true, true, false, true, false);
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
-        current = modeloTabela.getRowCount() - 1;
+        setCurrent(modeloTabela.getRowCount() - 1);
         tabelaCidade.setRowSelectionInterval(current, current);
-        Cidade cidade = modeloTabela.get(current);
-        preencherCampos(cidade);
-        setInterface(false, false, true, false, true, true, true, false, true, false);
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAnteriorActionPerformed
         if (current > 0) {
-            current--;
+            setCurrent(current - 1);
         }
         tabelaCidade.setRowSelectionInterval(current, current);
-        Cidade cidade = modeloTabela.get(current);
-        preencherCampos(cidade);
-        setInterface(false, false, true, false, true, true, true, false, true, false);
     }//GEN-LAST:event_botaoAnteriorActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
-        setInterface(false, false, true, false, false, false, true, false, true, true);
+        if (modo == INSERT) {
+            campoNome.setText("");
+        } else {
+            preencheCampos();
+        }
+        setModo(QWERY);
     }//GEN-LAST:event_botaoCancelaActionPerformed
 
     private void comboEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboEstadoActionPerformed
-        // TODO add your handling code here:
+        modeloTabela.limpar();
+        modeloTabela.addLista(cidadeDao.getAllFrom(modeloCombo.getSelectedItem()));
+        if(modo == QWERY){
+            campoNome.setText("");
+        }
     }//GEN-LAST:event_comboEstadoActionPerformed
 
     private void botaoNovoEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoEstadoActionPerformed
-        DialogEstado dialog = new DialogEstado((Frame)getParent(), true);
-        dialog.setVisible(true);
+        DialogEstado dialog = new DialogEstado((Frame) getParent(), true);
+        Estado estado = dialog.edtitEstado();
+        if(!modeloCombo.getAll().contains(estado)){
+            modeloCombo.add(estado);
+        }
+        comboEstado.setSelectedItem(estado);
+        comboEstado.repaint();
     }//GEN-LAST:event_botaoNovoEstadoActionPerformed
 
-    public String edtitCidade(){
+    public Cidade edtitCidade() {
         setVisible(true);
-        return modeloTabela.get(current).getNome();
+        return modeloTabela.get(current);
     }
-    
-    
+
     /**
      * @param args the command line arguments
      */
@@ -558,14 +570,12 @@ public class DialogCidade extends javax.swing.JDialog {
     private javax.swing.JButton botaoSalva;
     private javax.swing.JButton botaoUltimo;
     private javax.swing.JButton botaoVolta;
-    private javax.swing.JTextField campoId;
     private javax.swing.JTextField campoNome;
     private javax.swing.JComboBox<String> comboEstado;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel labelEstado;
+    private javax.swing.JLabel labelNome;
     private javax.swing.JTable tabelaCidade;
     // End of variables declaration//GEN-END:variables
 

@@ -72,15 +72,9 @@
                                   <Component id="botaoUltimo" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="labelId" alignment="1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="labelNome" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="labelNome" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="campoId" alignment="0" min="-2" pref="80" max="-2" attributes="0"/>
-                                      <Component id="campoNome" alignment="0" min="-2" pref="135" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="campoNome" min="-2" pref="135" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
                                   <Component id="labelSigla" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -111,11 +105,6 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="labelId" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="campoId" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="labelNome" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="campoNome" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
@@ -152,11 +141,6 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="labelId">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Id:"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JLabel" name="labelNome">
           <Properties>
             <Property name="text" type="java.lang.String" value="Nome:"/>
@@ -165,14 +149,6 @@
         <Component class="javax.swing.JLabel" name="labelSigla">
           <Properties>
             <Property name="text" type="java.lang.String" value="Sigla:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="campoId">
-          <Properties>
-            <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="0" green="0" red="0" type="rgb"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="campoNome">

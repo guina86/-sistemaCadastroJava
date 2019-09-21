@@ -8,6 +8,7 @@ package utilitarios;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import modelo.Bairro;
 import modelo.Fornecedor;
 
 /**
@@ -17,7 +18,7 @@ import modelo.Fornecedor;
 public class FornecedorTM extends AbstractTableModel {
 
     private final List<Fornecedor> linhas;
-    private final String[] colunas = new String[]{"Id", "Nome", "cnpj", "Endereço", "Bairro", "Cidade", "Estado"};
+    private final String[] colunas = new String[]{"Id", "Nome", "cnpj", "Endereço", "Bairro"};
 
     public FornecedorTM() {
         this.linhas = new ArrayList<>();
@@ -54,11 +55,7 @@ public class FornecedorTM extends AbstractTableModel {
             case 3:
                 return String.class;
             case 4:
-                return String.class;
-            case 5:
-                return String.class;
-            case 6:
-                return String.class;
+                return Bairro.class;
             default:
                 return String.class;
         }
@@ -78,10 +75,6 @@ public class FornecedorTM extends AbstractTableModel {
                 return fornecedor.getEndereco();
             case 4:
                 return fornecedor.getBairro();
-            case 5:
-                return fornecedor.getCidade();
-            case 6:
-                return fornecedor.getEstado();
             default:
                 throw new IndexOutOfBoundsException();
         }
@@ -105,13 +98,7 @@ public class FornecedorTM extends AbstractTableModel {
                 fornecedor.setEndereco(aValue.toString());
                 break;
             case 4:
-                fornecedor.setBairro(aValue.toString());
-                break;
-            case 5:
-                fornecedor.setCidade(aValue.toString());
-                break;
-            case 6:
-                fornecedor.setEstado(aValue.toString());
+                fornecedor.setBairro((Bairro)aValue);
                 break;
             default:
 
@@ -127,16 +114,12 @@ public class FornecedorTM extends AbstractTableModel {
         fornecedor.setCnpj(aValue.getCnpj());
         fornecedor.setEndereco(aValue.getEndereco());
         fornecedor.setBairro(aValue.getBairro());
-        fornecedor.setCidade(aValue.getCidade());
-        fornecedor.setEstado(aValue.getEstado());
 
         fireTableCellUpdated(rowIndex, 0);
         fireTableCellUpdated(rowIndex, 1);
         fireTableCellUpdated(rowIndex, 2);
         fireTableCellUpdated(rowIndex, 3);
         fireTableCellUpdated(rowIndex, 4);
-        fireTableCellUpdated(rowIndex, 5);
-        fireTableCellUpdated(rowIndex, 6);
     }
 
     @Override

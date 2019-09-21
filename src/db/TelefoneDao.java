@@ -17,9 +17,7 @@ import utilitarios.ConectaBanco;
  */
 public class TelefoneDao implements Dao<Telefone> {
 
-//    public final Map<String, Integer> map;
     public TelefoneDao() {
-//        map = new HashMap<>(getMap());
     }
 
     @Override
@@ -205,8 +203,8 @@ public class TelefoneDao implements Dao<Telefone> {
     public List<Telefone> numeros(String nome, String tipo) {
         String sql = "";
         if (tipo.equals("Cliente")) {
-            sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_cliente as tc ON t.id = tc.id_telefone "
-                    + "JOIN clientes as c ON tc.id_cliente = c.id WHERE c.nome = ?";
+            sql = "SELECT t.id, t.numero FROM telefones t JOIN telefone_cliente tc ON t.id = tc.id_telefone "
+                    + "JOIN clientes c ON tc.id_cliente = c.id WHERE c.nome = ?";
         } else {
             sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_fornecedor as tc ON t.id = tc.id_telefone "
                     + "JOIN fornecedor as f ON tc.id_cliente = f.id WHERE f.nome = ?";

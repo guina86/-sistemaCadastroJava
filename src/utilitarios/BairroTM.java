@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import modelo.Bairro;
+import modelo.Cidade;
 
 /**
  *
@@ -50,7 +51,7 @@ public class BairroTM extends AbstractTableModel {
             case 1:
                 return String.class;
             case 2:
-                return String.class;
+                return Cidade.class;
             default:
                 return String.class;
         }
@@ -83,7 +84,7 @@ public class BairroTM extends AbstractTableModel {
                 bairro.setNome(aValue.toString());
                 break;
             case 2:
-                bairro.setCidade(aValue.toString());
+                bairro.setCidade((Cidade)aValue);
                 break;
             default:
 

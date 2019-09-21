@@ -387,7 +387,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         // TODO add your handling code here:
     }//GEN-LAST:event_campoNumeroActionPerformed
 
-    public List<String> editTelefone(String nome,String tipo, List<String> lista) {
+    public List<Telefone> editTelefone(String nome,String tipo, List<Telefone> lista) {
         campoNome.setText(nome);
         if (nome.equals("Novo Cliente") || nome.equals("Novo Fornecedor")) {
             lista.forEach(s -> modeloTabela.add(new Telefone(s)));

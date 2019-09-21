@@ -38,7 +38,7 @@ public class EstadoDao implements Dao<Estado> {
 
     @Override
     public List<Estado> getAll() {
-        String sql = "SELECT * FROM estados";
+        String sql = "SELECT * FROM estados ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
