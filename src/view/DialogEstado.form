@@ -214,7 +214,6 @@
               <Image iconType="3" name="/imagens/edit_36p.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Editar"/>
-            <Property name="enabled" type="boolean" value="false"/>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[50, 50]"/>
             </Property>
@@ -235,7 +234,6 @@
               <Image iconType="3" name="/imagens/delete_36p.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Apagar"/>
-            <Property name="enabled" type="boolean" value="false"/>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[50, 50]"/>
             </Property>

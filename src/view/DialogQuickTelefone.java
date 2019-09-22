@@ -29,7 +29,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
     private static final int UPDATE = 2;
     private int current;
     private int modo;
-    private String tipo;
+    
 
     /**
      * Creates new form DialogTelefone
@@ -66,27 +66,26 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, true, false, true, true, false, true, true, true);
+                setInterface(false, true, false, true, false, true, true, true);
                 break;
             case INSERT:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, true, false, false, true);
+                setInterface(true, false, true, false, true, false, false, true);
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, true, false, true, false);
+                setInterface(true, false, true, false, true, false, true, false);
                 break;
             default:
                 break;
         }
     }
 
-    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean apaga, boolean cancela, boolean tabela, boolean combo, boolean limpaCampos) {
+    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean cancela, boolean tabela, boolean combo, boolean limpaCampos) {
         limpaCampos(limpaCampos);
         campoNumero.setEnabled(nome);
         botaoSalva.setEnabled(salva);
         botaoEdita.setEnabled(edita);
-        botaoApaga.setEnabled(apaga);
         botaoNovo.setEnabled(novo);
         botaoCancela.setEnabled(cancela);
         tabelaTelefone.setRowSelectionAllowed(tabela);
@@ -125,7 +124,6 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         botaoNovo = new javax.swing.JButton();
         botaoSalva = new javax.swing.JButton();
         botaoEdita = new javax.swing.JButton();
-        botaoApaga = new javax.swing.JButton();
         botaoVolta = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaTelefone = new javax.swing.JTable();
@@ -175,17 +173,6 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
             }
         });
 
-        botaoApaga.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/delete_36p.png"))); // NOI18N
-        botaoApaga.setToolTipText("Apagar");
-        botaoApaga.setMaximumSize(new java.awt.Dimension(50, 50));
-        botaoApaga.setMinimumSize(new java.awt.Dimension(50, 50));
-        botaoApaga.setPreferredSize(new java.awt.Dimension(50, 50));
-        botaoApaga.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoApagaActionPerformed(evt);
-            }
-        });
-
         botaoVolta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/exit_36p.png"))); // NOI18N
         botaoVolta.setToolTipText("Voltar");
         botaoVolta.setMaximumSize(new java.awt.Dimension(50, 50));
@@ -216,7 +203,7 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         jScrollPane1.setViewportView(tabelaTelefone);
 
         botaoCancela.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cancel_36p.png"))); // NOI18N
-        botaoCancela.setToolTipText("Voltar");
+        botaoCancela.setToolTipText("Cancelar");
         botaoCancela.setEnabled(false);
         botaoCancela.setMaximumSize(new java.awt.Dimension(50, 50));
         botaoCancela.setMinimumSize(new java.awt.Dimension(50, 50));
@@ -249,29 +236,27 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(labelNome)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(campoNome, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(campoNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(campoNumero))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -286,11 +271,10 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(botaoSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoEdita, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botaoApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoNovo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoCancela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoVolta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -325,20 +309,12 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         if (modo == INSERT) {
             if (campoNumero.getValue() != null) {
                 Telefone telefone = new Telefone(campoNumero.getText());
-                if (!campoNome.getText().equals("Novo Cliente") && !campoNome.getText().equals("Novo Fornecedor")) {
-                    int id = telefoneDao.save(telefone, campoNome.getText(), tipo);
-                    telefone.setId(id);
-                }
                 modeloTabela.add(telefone);
-
             }
-
         } else if (modo == UPDATE) {
-            Telefone telefone = new Telefone(modeloTabela.get(current).getId(), campoNumero.getText());
-            if (!campoNome.getText().equals("Novo Cliente") && !campoNome.getText().equals("Novo Fornecedor")) {
-                telefoneDao.update(telefone);
-            }
-            modeloTabela.setValueAt(telefone, current);
+            modeloTabela.get(current).setNumero(campoNumero.getText());
+            
+//            modeloTabela.setValueAt(telefone, current);
         }
         setModo(QWERY);
     }//GEN-LAST:event_botaoSalvaActionPerformed
@@ -351,20 +327,6 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
             campoNumero.requestFocus();
         }
     }//GEN-LAST:event_botaoEditaActionPerformed
-
-    private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        if (tabelaTelefone.getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
-        } else {
-            int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNumero.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
-            if (option == JOptionPane.YES_OPTION) {
-                if (!campoNome.getText().equals("Novo Cliente")) {
-                    telefoneDao.delete(modeloTabela.get(current).getId(), tipo);
-                }
-                modeloTabela.remove(current);
-            }
-        }
-    }//GEN-LAST:event_botaoApagaActionPerformed
 
     private void botaoVoltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoVoltaActionPerformed
         this.dispose();
@@ -387,18 +349,15 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
         // TODO add your handling code here:
     }//GEN-LAST:event_campoNumeroActionPerformed
 
-    public List<Telefone> editTelefone(String nome,String tipo, List<Telefone> lista) {
+    public List<Telefone> editTelefone(List<Telefone> lista, String nome) {
         campoNome.setText(nome);
-        if (nome.equals("Novo Cliente") || nome.equals("Novo Fornecedor")) {
-            lista.forEach(s -> modeloTabela.add(new Telefone(s)));
-        } else{
-            modeloTabela.addLista(telefoneDao.numeros(nome, tipo));
-        }
-        this.tipo = tipo;
+        System.out.println(lista);
+        modeloTabela.addLista(lista);
         setVisible(true);
         return modeloTabela.getLista();
     }
 
+    
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -458,7 +417,6 @@ public class DialogQuickTelefone extends javax.swing.JDialog implements ActionLi
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton botaoApaga;
     private javax.swing.JButton botaoCancela;
     private javax.swing.JButton botaoEdita;
     private javax.swing.JButton botaoNovo;

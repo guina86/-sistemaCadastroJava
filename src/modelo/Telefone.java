@@ -5,6 +5,8 @@
  */
 package modelo;
 
+import java.util.Objects;
+
 /**
  *
  * @author Leandro Guina
@@ -41,6 +43,37 @@ public class Telefone {
         this.numero = numero;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + Objects.hashCode(this.id);
+        hash = 83 * hash + Objects.hashCode(this.numero);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Telefone other = (Telefone) obj;
+        if (!Objects.equals(this.numero, other.numero)) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
     @Override
     public String toString() {
         return getNumero();

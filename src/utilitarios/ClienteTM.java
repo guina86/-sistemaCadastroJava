@@ -8,6 +8,7 @@ package utilitarios;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import modelo.Bairro;
 import modelo.Cliente;
 
 /**
@@ -17,7 +18,7 @@ import modelo.Cliente;
 public class ClienteTM extends AbstractTableModel {
 
     private final List<Cliente> linhas;
-    private final String[] colunas = new String[]{"Id", "Nome", "Endereço", "RG", "CPF", "Bairro", "Cidade", "Estado"};
+    private final String[] colunas = new String[]{"Id", "Nome", "Endereço", "RG", "CPF", "Bairro"};
 
     public ClienteTM() {
         this.linhas = new ArrayList<>();
@@ -56,11 +57,7 @@ public class ClienteTM extends AbstractTableModel {
             case 4:
                 return String.class;
             case 5:
-                return String.class;
-            case 6:
-                return String.class;
-            case 7:
-                return String.class;
+                return Bairro.class;
             default:
                 return String.class;
         }
@@ -82,10 +79,6 @@ public class ClienteTM extends AbstractTableModel {
                 return cliente.getCpf();
             case 5:
                 return cliente.getBairro();
-            case 6:
-                return cliente.getCidade();
-            case 7:
-                return cliente.getEstado();
             default:
                 throw new IndexOutOfBoundsException();
         }
@@ -112,13 +105,7 @@ public class ClienteTM extends AbstractTableModel {
                 cliente.setCpf(aValue.toString());
                 break;
             case 5:
-                cliente.setBairro(aValue.toString());
-                break;
-            case 6:
-                cliente.setCidade(aValue.toString());
-                break;
-            case 7:
-                cliente.setEstado(aValue.toString());
+                cliente.setBairro((Bairro)aValue);
                 break;
             default:
 
@@ -135,8 +122,6 @@ public class ClienteTM extends AbstractTableModel {
         cliente.setRg(aValue.getRg());
         cliente.setCpf(aValue.getCpf());
         cliente.setBairro(aValue.getBairro());
-        cliente.setCidade(aValue.getCidade());
-        cliente.setEstado(aValue.getEstado());
 
         fireTableCellUpdated(rowIndex, 0);
         fireTableCellUpdated(rowIndex, 1);
@@ -144,8 +129,6 @@ public class ClienteTM extends AbstractTableModel {
         fireTableCellUpdated(rowIndex, 3);
         fireTableCellUpdated(rowIndex, 4);
         fireTableCellUpdated(rowIndex, 5);
-        fireTableCellUpdated(rowIndex, 6);
-        fireTableCellUpdated(rowIndex, 7);
     }
 
     @Override

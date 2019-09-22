@@ -75,13 +75,13 @@ public class TelefoneDao implements Dao<Telefone> {
         return 0;
     }
 
-    public int save(Telefone telefone, String nome, String tipo) {
+    public int save(Telefone telefone,Integer ownerId, String tipo) {
         String sql1 = "INSERT INTO telefones (numero) VALUES (?)";
         String sql2 = "";
         if (tipo.equals("Cliente")) {
-            sql2 = "INSERT INTO telefone_cliente (id_telefone, id_cliente) VALUES (? , (SELECT id FROM clientes WHERE nome = ?))";
+            sql2 = "INSERT INTO telefone_cliente (id_telefone, id_cliente) VALUES (?, ?)";
         } else {
-            sql2 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (? , (SELECT id FROM fornecedores WHERE nome = ?))";
+            sql2 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (?, ?)";
         }
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps1 = conn.prepareStatement(sql1, Statement.RETURN_GENERATED_KEYS);
@@ -95,7 +95,7 @@ public class TelefoneDao implements Dao<Telefone> {
                 id = rs.getInt(1);
             }
             ps2.setInt(1, id);
-            ps2.setString(2, nome);
+            ps2.setInt(2, ownerId);
             ps2.executeUpdate();
             rs.close();
             conn.commit();
@@ -167,62 +167,5 @@ public class TelefoneDao implements Dao<Telefone> {
             e.printStackTrace();
         }
     }
-
-    public List<String> clientes() {
-        String sql = "SELECT nome FROM clientes";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<String> fornecedores() {
-        String sql = "SELECT nome FROM fornecedores";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<Telefone> numeros(String nome, String tipo) {
-        String sql = "";
-        if (tipo.equals("Cliente")) {
-            sql = "SELECT t.id, t.numero FROM telefones t JOIN telefone_cliente tc ON t.id = tc.id_telefone "
-                    + "JOIN clientes c ON tc.id_cliente = c.id WHERE c.nome = ?";
-        } else {
-            sql = "SELECT t.id, t.numero FROM telefones as t JOIN telefone_fornecedor as tc ON t.id = tc.id_telefone "
-                    + "JOIN fornecedor as f ON tc.id_cliente = f.id WHERE f.nome = ?";
-        }
-        try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, nome);
-            ResultSet rs = ps.executeQuery();
-            List<Telefone> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(new Telefone(rs.getInt("id"), rs.getString("numero")));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
 }

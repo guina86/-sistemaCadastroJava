@@ -29,12 +29,10 @@ public class DialogCidade extends javax.swing.JDialog {
     private static final int UPDATE = 2;
     private int current;
     private int modo;
-    
 
     /**
      * Creates new form DialogCidade
      */
-    
     public DialogCidade(Frame owner, boolean modal) {
         super(owner, modal);
         cidadeDao = new CidadeDao();
@@ -48,11 +46,11 @@ public class DialogCidade extends javax.swing.JDialog {
         // variaveis globais
         current = 0;
         modo = QWERY;
-        
+
         // comboBox
         comboEstado.setModel(modeloCombo);
         preencheComboEstado();
-        
+
         // tabela
         tabelaCidade.setModel(modeloTabela);
         tabelaCidade.getColumnModel().getColumn(0).setPreferredWidth(40);
@@ -439,11 +437,15 @@ public class DialogCidade extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        int opcao = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
-        if (opcao == JOptionPane.YES_OPTION) {
-            cidadeDao.delete(modeloTabela.get(current));
-            modeloTabela.remove(current);
-            campoNome.setText("");
+        if (tabelaCidade.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            int opcao = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
+            if (opcao == JOptionPane.YES_OPTION) {
+                cidadeDao.delete(modeloTabela.get(current));
+                modeloTabela.remove(current);
+                campoNome.setText("");
+            }
         }
     }//GEN-LAST:event_botaoApagaActionPerformed
 
@@ -458,30 +460,38 @@ public class DialogCidade extends javax.swing.JDialog {
     }//GEN-LAST:event_tabelaCidadeMouseClicked
 
     private void botaoPrimeiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoPrimeiroActionPerformed
-        setCurrent(0);
-        tabelaCidade.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(0);
+            tabelaCidade.setRowSelectionInterval(current, current);
+        }
     }//GEN-LAST:event_botaoPrimeiroActionPerformed
 
     private void botaoProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoProximoActionPerformed
-        int size = modeloTabela.getRowCount();
-        if (tabelaCidade.getSelectedRow() == -1) {
-            setCurrent(0);
-        } else if (size > 1 && current < size - 1) {
-            setCurrent(current + 1);
+        if (!modeloTabela.isEmpty()) {
+            int size = modeloTabela.getRowCount();
+            if (tabelaCidade.getSelectedRow() == -1) {
+                setCurrent(0);
+            } else if (size > 1 && current < size - 1) {
+                setCurrent(current + 1);
+            }
+            tabelaCidade.setRowSelectionInterval(current, current);
         }
-        tabelaCidade.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
-        setCurrent(modeloTabela.getRowCount() - 1);
-        tabelaCidade.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(modeloTabela.getRowCount() - 1);
+            tabelaCidade.setRowSelectionInterval(current, current);
+        }
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAnteriorActionPerformed
-        if (current > 0) {
-            setCurrent(current - 1);
+        if (!modeloTabela.isEmpty()) {
+            if (current > 0) {
+                setCurrent(current - 1);
+            }
+            tabelaCidade.setRowSelectionInterval(current, current);
         }
-        tabelaCidade.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoAnteriorActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
@@ -496,7 +506,7 @@ public class DialogCidade extends javax.swing.JDialog {
     private void comboEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboEstadoActionPerformed
         modeloTabela.limpar();
         modeloTabela.addLista(cidadeDao.getAllFrom(modeloCombo.getSelectedItem()));
-        if(modo == QWERY){
+        if (modo == QWERY) {
             campoNome.setText("");
         }
     }//GEN-LAST:event_comboEstadoActionPerformed
@@ -504,7 +514,7 @@ public class DialogCidade extends javax.swing.JDialog {
     private void botaoNovoEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoEstadoActionPerformed
         DialogEstado dialog = new DialogEstado((Frame) getParent(), true);
         Estado estado = dialog.edtitEstado();
-        if(!modeloCombo.getAll().contains(estado)){
+        if (!modeloCombo.getAll().contains(estado)) {
             modeloCombo.add(estado);
         }
         comboEstado.setSelectedItem(estado);
@@ -513,7 +523,11 @@ public class DialogCidade extends javax.swing.JDialog {
 
     public Cidade edtitCidade() {
         setVisible(true);
-        return modeloTabela.get(current);
+        if(!modeloTabela.isEmpty()){
+            return modeloTabela.get(current);
+        } else {
+            return null;
+        }
     }
 
     /**

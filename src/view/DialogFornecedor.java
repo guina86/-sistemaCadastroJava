@@ -275,7 +275,7 @@ public class DialogFornecedor extends javax.swing.JDialog {
 
         labelTel.setText("Tel:");
 
-        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edit_18p.png"))); // NOI18N
+        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
         botaoNovoTelefone.setToolTipText("Novo Telefone");
         botaoNovoTelefone.setEnabled(false);
         botaoNovoTelefone.addActionListener(new java.awt.event.ActionListener() {
@@ -596,9 +596,11 @@ public class DialogFornecedor extends javax.swing.JDialog {
             if (modo == INSERT) {
                 int id = fornecedorDao.save(fornecedor);
                 fornecedor.setId(id);
+                fornecedor.setTelefones(fornecedorDao.telefones(fornecedor));
                 modeloTabela.add(fornecedor);
             } else if (modo == UPDATE) {
                 fornecedorDao.update(fornecedor);
+//                fornecedor.setTelefones(fornecedorDao.telefones(fornecedor));
                 modeloTabela.setValueAt(fornecedor, current);
             }
             setModo(QWERY);
@@ -664,35 +666,17 @@ public class DialogFornecedor extends javax.swing.JDialog {
 
     private void botaoNovoTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoTelefoneActionPerformed
         DialogQuickTelefone dialog = new DialogQuickTelefone((Frame) getParent(), true);
-        if (modo == INSERT) {
-//            List<String> lista = getComboTelefones();
-            List<Telefone> lista = modeloComboTelefone.getAll();
-            modeloComboTelefone.clear();
-            modeloComboTelefone.addAll(dialog.editTelefone("Novo Fornecedor", "Fornecedor", lista));
-            if (!modeloComboTelefone.isEmpty()) {
-                comboTelefone.setSelectedIndex(0);
-            }
-        } else {
-            dialog.editTelefone(modeloTabela.getColumnName(current), "Fornecedor", null);
-            comboTelefone.removeAllItems();
-            Fornecedor fornecedor = modeloTabela.get(current);
-            List<String> telefones = fornecedorDao.telefones(fornecedor);
-            if (!telefones.isEmpty()) {
-                telefones.forEach(s -> comboTelefone.addItem(s));
-            } else {
-                comboTelefone.addItem("");
-            }
-        }
+        String nome = campoNome.getText().equals("") ? "Novo Fornecedor" : campoNome.getText();
+        List<Telefone> telefones = dialog.editTelefone(modeloComboTelefone.getAll(), nome);
+        modeloComboTelefone.clear();
+        modeloComboTelefone.addAll(telefones);
+//        modeloComboTelefone.addAll(dialog.editTelefone(telefones, nome));
+
     }//GEN-LAST:event_botaoNovoTelefoneActionPerformed
 
     private void botaoNovoEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoEstadoActionPerformed
-//        String estado = new DialogEstado((Frame) getParent(), true).edtitEstado();
-//        comboEstado.addItem(estado);
-//        comboEstado.setSelectedItem(estado);
-
-        DialogEstado dialog = new DialogEstado((Frame) getParent(), true);
-        Estado estado = dialog.edtitEstado();
-        if (!modeloComboEstado.getAll().contains(estado)) {
+        Estado estado = new DialogEstado((Frame) getParent(), true).edtitEstado();
+        if (estado != null && !modeloComboEstado.getAll().contains(estado)) {
             modeloComboEstado.add(estado);
         }
         comboEstado.setSelectedItem(estado);
@@ -701,13 +685,8 @@ public class DialogFornecedor extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoNovoEstadoActionPerformed
 
     private void botaoNovoCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoCidadeActionPerformed
-//        Cidade cidade = new DialogCidade((Frame) getParent(), true).edtitCidade();
-//        modeloComboCidade.add(cidade);
-//        comboCidade.setSelectedItem(cidade);
-
-        DialogCidade dialog = new DialogCidade((Frame) getParent(), true);
-        Cidade cidade = dialog.edtitCidade();
-        if (!modeloComboCidade.getAll().contains(cidade)) {
+        Cidade cidade = new DialogCidade((Frame) getParent(), true).edtitCidade();
+        if (cidade != null && !modeloComboCidade.getAll().contains(cidade)) {
             modeloComboCidade.add(cidade);
         }
         comboCidade.setSelectedItem(cidade);

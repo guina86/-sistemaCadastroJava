@@ -49,7 +49,7 @@ public class DialogBairro extends javax.swing.JDialog {
 
         // comboBox
         comboCidade.setModel(modeloCombo);
-        preencherComboCidade();
+        preencheComboCidade();
 
         // tabela
         tabelaBairro.setModel(modeloTabela);
@@ -107,7 +107,7 @@ public class DialogBairro extends javax.swing.JDialog {
         preencheCampos();
     }
 
-    private void preencherComboCidade() {
+    private void preencheComboCidade() {
         modeloCombo.setSelectedItem(null);
         modeloCombo.addAll(bairroDao.cidades());
     }
@@ -437,11 +437,15 @@ public class DialogBairro extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            bairroDao.delete(modeloTabela.get(current));
-            modeloTabela.remove(current);
-            campoNome.setText("");
+        if (tabelaBairro.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                bairroDao.delete(modeloTabela.get(current));
+                modeloTabela.remove(current);
+                campoNome.setText("");
+            }
         }
     }//GEN-LAST:event_botaoApagaActionPerformed
 
@@ -456,30 +460,38 @@ public class DialogBairro extends javax.swing.JDialog {
     }//GEN-LAST:event_tabelaBairroMouseClicked
 
     private void botaoPrimeiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoPrimeiroActionPerformed
-        setCurrent(0);
-        tabelaBairro.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(0);
+            tabelaBairro.setRowSelectionInterval(current, current);
+        }
     }//GEN-LAST:event_botaoPrimeiroActionPerformed
 
     private void botaoProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoProximoActionPerformed
-        int size = modeloTabela.getRowCount();
-        if (tabelaBairro.getSelectedRow() == -1) {
-            setCurrent(0);
-        } else if (size > 1 && current < size - 1) {
-            setCurrent(current + 1);
+        if (!modeloTabela.isEmpty()) {
+            int size = modeloTabela.getRowCount();
+            if (tabelaBairro.getSelectedRow() == -1) {
+                setCurrent(0);
+            } else if (size > 1 && current < size - 1) {
+                setCurrent(current + 1);
+            }
+            tabelaBairro.setRowSelectionInterval(current, current);
         }
-        tabelaBairro.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
-        setCurrent(modeloTabela.getRowCount() - 1);
-        tabelaBairro.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(modeloTabela.getRowCount() - 1);
+            tabelaBairro.setRowSelectionInterval(current, current);
+        }
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAnteriorActionPerformed
-        if (current > 0) {
-            setCurrent(current - 1);
+        if (!modeloTabela.isEmpty()) {
+            if (current > 0) {
+                setCurrent(current - 1);
+            }
+            tabelaBairro.setRowSelectionInterval(current, current);
         }
-        tabelaBairro.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoAnteriorActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
@@ -494,7 +506,7 @@ public class DialogBairro extends javax.swing.JDialog {
     private void comboCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCidadeActionPerformed
         modeloTabela.limpar();
         modeloTabela.addLista(bairroDao.getAllFrom(modeloCombo.getSelectedItem()));
-        if(modo == QWERY){
+        if (modo == QWERY) {
             campoNome.setText("");
         }
     }//GEN-LAST:event_comboCidadeActionPerformed
@@ -502,7 +514,7 @@ public class DialogBairro extends javax.swing.JDialog {
     private void botaoNovoCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoCidadeActionPerformed
         DialogCidade dialog = new DialogCidade((Frame) getParent(), true);
         Cidade cidade = dialog.edtitCidade();
-        if(!modeloCombo.getAll().contains(cidade)){
+        if (!modeloCombo.getAll().contains(cidade)) {
             modeloCombo.add(cidade);
         }
         comboCidade.setSelectedItem(cidade);

@@ -8,7 +8,11 @@ package db;
 import java.util.List;
 import java.sql.*;
 import java.util.ArrayList;
+import modelo.Bairro;
+import modelo.Cidade;
 import modelo.Cliente;
+import modelo.Estado;
+import modelo.Telefone;
 import utilitarios.ConectaBanco;
 
 /**
@@ -24,18 +28,30 @@ public class ClienteDao implements Dao<Cliente> {
 
     @Override
     public Cliente get(Integer id) {
-        String sql = "SELECT c.id, c.nome, c.endereco, c.rg, c.cpf, b.nome AS bairro, ci.nome AS cidade, e.nome AS estado "
+        String sql = "SELECT c.id, c.nome, c.endereco, c.rg, c.cpf, c.id_bairro, b.nome AS bairro, b.id_cidade, ci.nome AS cidade, ci.id_estado, e.nome AS estado, e.sigla "
                 + "FROM clientes c JOIN bairros b ON c.id_bairro = b.id "
-                + "JOIN cidades ci ON c.id_cidade = ci.id "
-                + "JOIN estados e ON c.id_estado = e.id "
+                + "JOIN cidades ci ON b.id_cidade = ci.id "
+                + "JOIN estados e ON ci.id_estado = e.id "
                 + "WHERE c.id = ?";
+        String sql2 = "SELECT id, numero FROM telefones JOIN telefone_cliente ON id = id_telefone WHERE id_cliente = ?";
         try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps2 = conn.prepareStatement(sql2)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             Cliente cliente = null;
             if (rs.next()) {
-                cliente = new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("endereco"), rs.getString("rg"), rs.getString("cpf"), rs.getString("bairro"), rs.getString("cidade"), rs.getString("estado"));
+                ps2.setInt(1, id);
+                ResultSet rs2 = ps2.executeQuery();
+                List<Telefone> telefones = new ArrayList<>();
+                while(rs2.next()){
+                    telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
+                }
+                Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
+                Cidade cidade = new Cidade(rs.getInt("id_cidade"), rs.getString("cidade"), estado);
+                Bairro bairro = new Bairro(rs.getInt("id_bairro"), rs.getString("bairro"), cidade);
+                cliente = new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("endereco"), rs.getString("rg"), rs.getString("cpf"), bairro, telefones);
+                rs2.close();
             }
             rs.close();
             return cliente;
@@ -47,19 +63,31 @@ public class ClienteDao implements Dao<Cliente> {
 
     @Override
     public List<Cliente> getAll() {
-        String sql = "SELECT c.id, c.nome, c.endereco, c.rg, c.cpf, b.nome AS bairro, ci.nome AS cidade, e.nome AS estado "
+        String sql = "SELECT c.id, c.nome, c.endereco, c.rg, c.cpf, c.id_bairro, b.nome AS bairro, b.id_cidade, ci.nome AS cidade, ci.id_estado, e.nome AS estado, e.sigla "
                 + "FROM clientes c JOIN bairros b ON c.id_bairro = b.id "
-                + "JOIN cidades ci ON c.id_cidade = ci.id "
-                + "JOIN estados e ON c.id_estado = e.id ";
+                + "JOIN cidades ci ON b.id_cidade = ci.id "
+                + "JOIN estados e ON ci.id_estado = e.id ";
+        String sql2 = "SELECT id, numero FROM telefones JOIN telefone_cliente ON id = id_telefone WHERE id_cliente = ?";
         try (Connection conn = ConectaBanco.getConexao();
+                PreparedStatement ps = conn.prepareStatement(sql2);
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            List<Cliente> lista = new ArrayList<>();
+            List<Cliente> clientes = new ArrayList<>();
             while (rs.next()) {
-                Cliente cliente = new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("endereco"), rs.getString("rg"), rs.getString("cpf"), rs.getString("bairro"), rs.getString("cidade"), rs.getString("estado"));
-                lista.add(cliente);
+                ps.setInt(1, rs.getInt("id"));
+                ResultSet rs2 = ps.executeQuery();
+                List<Telefone> telefones = new ArrayList<>();
+                while(rs2.next()){
+                    telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
+                }
+                Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
+                Cidade cidade = new Cidade(rs.getInt("id_cidade"), rs.getString("cidade"), estado);
+                Bairro bairro = new Bairro(rs.getInt("id_bairro"), rs.getString("bairro"), cidade);
+                clientes.add(new Cliente(rs.getInt("id"), rs.getString("nome"), rs.getString("endereco"), rs.getString("rg"), rs.getString("cpf"), bairro, telefones));
+                rs2.close();
             }
-            return lista;
+            rs.close();
+            return clientes;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -68,36 +96,7 @@ public class ClienteDao implements Dao<Cliente> {
 
     @Override
     public int save(Cliente cliente) {
-        String sql = "INSERT INTO clientes (nome, endereco, rg, cpf, id_bairro, id_cidade, id_estado) "
-                + "VALUES (?, ?, ?, ?,(SELECT id FROM bairros WHERE nome = ?), "
-                + "(SELECT id FROM cidades WHERE nome = ?), "
-                + "(SELECT id FROM estados WHERE nome = ?))";
-        try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, cliente.getNome());
-            ps.setString(2, cliente.getEndereco());
-            ps.setString(3, cliente.getRg());
-            ps.setString(4, cliente.getCpf());
-            ps.setString(5, cliente.getBairro());
-            ps.setString(6, cliente.getCidade());
-            ps.setString(7, cliente.getEstado());
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-            rs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public int save(Cliente cliente, List<String> telefones) {
-        String sql = "INSERT INTO clientes (nome, endereco, rg, cpf, id_bairro, id_cidade, id_estado) "
-                + "VALUES (?, ?, ?, ?,(SELECT id FROM bairros WHERE nome = ?), "
-                + "(SELECT id FROM cidades WHERE nome = ?), "
-                + "(SELECT id FROM estados WHERE nome = ?))";
+        String sql = "INSERT INTO clientes (nome, endereco, rg, cpf, id_bairro) VALUES (?, ?, ?, ?, ?)";
         String sql2 = "INSERT INTO telefones (numero) VALUES (?)";
         String sql3 = "INSERT INTO telefone_cliente (id_telefone, id_cliente) VALUES (? , ?)";
         try (Connection conn = ConectaBanco.getConexao();
@@ -109,55 +108,49 @@ public class ClienteDao implements Dao<Cliente> {
             ps.setString(2, cliente.getEndereco());
             ps.setString(3, cliente.getRg());
             ps.setString(4, cliente.getCpf());
-            ps.setString(5, cliente.getBairro());
-            ps.setString(6, cliente.getCidade());
-            ps.setString(7, cliente.getEstado());
+            ps.setInt(5, cliente.getBairro().getId());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             int id = 0;
             if (rs.next()) {
-                 id = rs.getInt(1);
+                id = rs.getInt(1);
             }
             rs.close();
-            for(String telefone : telefones){
-                ps2.setString(1, telefone);
-                ps2.executeUpdate();
-                ResultSet rs2 = ps2.getGeneratedKeys();
-                int idTel = 0;
-                if(rs2.next()){
-                    idTel = rs2.getInt(1);
+            if (!cliente.getTelefones().isEmpty()) {
+                for (Telefone telefone : cliente.getTelefones()) {
+                    ps2.setString(1, telefone.getNumero());
+                    ps2.executeUpdate();
+                    ResultSet rs2 = ps2.getGeneratedKeys();
+                    int idTel = 0;
+                    if (rs2.next()) {
+                        idTel = rs2.getInt(1);
+                    }
+                    ps3.setInt(1, idTel);
+                    ps3.setInt(2, id);
+                    ps3.executeUpdate();
+                    rs2.close();
                 }
-                ps3.setInt(1, idTel);
-                ps3.setInt(2, id);
-                ps3.executeUpdate();
-                rs2.close();
             }
             conn.commit();
             conn.setAutoCommit(true);
-            return id;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return 0;
     }
+    
 
     @Override
     public void update(Cliente cliente) {
-        String sql = "UPDATE clientes SET nome = ?, endereco = ?, rg = ?, cpf = ?, "
-                + "id_bairro = (SELECT id FROM bairros WHERE nome = ?), "
-                + "id_cidade = (SELECT id FROM cidades WHERE nome = ?), "
-                + "id_estado = (SELECT id FROM estados WHERE nome = ?) "
-                + "WHERE id = ?";
+        String sql = "UPDATE clientes SET nome = ?, endereco = ?, rg = ?, cpf = ?, id_bairro = ? WHERE id = ?";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, cliente.getNome());
             ps.setString(2, cliente.getEndereco());
             ps.setString(3, cliente.getRg());
             ps.setString(4, cliente.getCpf());
-            ps.setString(5, cliente.getBairro());
-            ps.setString(6, cliente.getCidade());
-            ps.setString(7, cliente.getEstado());
-            ps.setInt(8, cliente.getId());
+            ps.setInt(5, cliente.getBairro().getId());
+            ps.setInt(6, cliente.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,51 +161,36 @@ public class ClienteDao implements Dao<Cliente> {
     @Override
     public void delete(Cliente cliente) {
         String sql = "DELETE FROM clientes WHERE id = ?";
+        String sql2 = "DELETE FROM telefones WHERE id = ?";
+        String sql3 = "DELETE FROM  telefone_cliente WHERE id_cliente = ?";
         try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps2 = conn.prepareStatement(sql2);
+                PreparedStatement ps3 = conn.prepareStatement(sql3)) {
             ps.setInt(1, cliente.getId());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delete(int id) {
-        String sql = "DELETE FROM clientes WHERE id = ?";
-        try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<String> telefones() {
-        String sql = "SELECT numero FROM telefones JOIN telefone_cliente ON id = id_telefone ORDER BY numero";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("numero"));
+            if (!cliente.getTelefones().isEmpty()) {
+                for (Telefone telefone : cliente.getTelefones()) {
+                    ps2.setInt(1, telefone.getId());
+                    ps2.executeUpdate();
+                }
+                ps3.setInt(1, cliente.getId());
+                ps3.executeUpdate();
             }
-            return lista;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
     }
-    
-    public List<String> telefones(Cliente cliente) {
+
+     public List<Telefone> telefones(Cliente cliente) {
         String sql = "SELECT numero FROM telefones JOIN telefone_cliente ON id = id_telefone WHERE id_cliente = ? ORDER BY numero";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cliente.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Telefone> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("numero"));
+                lista.add(new Telefone(rs.getInt("id"),rs.getString("numero")));
             }
             rs.close();
             return lista;
@@ -222,32 +200,15 @@ public class ClienteDao implements Dao<Cliente> {
         return null;
     }
 
-    public List<String> bairros(){
-        String sql = "SELECT nome FROM bairros ORDER BY nome";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-        
-    }
-    
-    public List<String> bairros(String cidade){
-        String sql = "SELECT nome FROM bairros WHERE id_cidade = (SELECT id FROM cidades WHERE nome = ?) ORDER BY nome";
+    public List<Bairro> bairros(Cidade cidade){
+        String sql = "SELECT * FROM bairros WHERE id_cidade = ? ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, cidade);
+            ps.setInt(1, cidade.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Bairro> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Bairro(rs.getInt("id"), rs.getString("nome"), cidade));
             }
             rs.close();
             return lista;
@@ -258,34 +219,15 @@ public class ClienteDao implements Dao<Cliente> {
         
     }
     
-    
-    public List<String> cidades(){
-        String sql = "SELECT nome FROM cidades ORDER BY nome";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-        
-    }
-    
-    
-    public List<String> cidades(String estado){
-        String sql = "SELECT nome FROM cidades WHERE id_estado = (SELECT id FROM estados WHERE nome = ?) ORDER BY nome";
+      public List<Cidade> cidades(Estado estado){
+        String sql = "SELECT * FROM cidades WHERE id_estado = ? ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, estado);
+            ps.setInt(1, estado.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Cidade> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Cidade(rs.getInt("id"), rs.getString("nome"), estado));
             }
             rs.close();
             return lista;
@@ -296,15 +238,14 @@ public class ClienteDao implements Dao<Cliente> {
         
     }
     
-    
-    public List<String> estados(){
-        String sql = "SELECT nome FROM estados ORDER BY nome";
+    public List<Estado> estados(){
+        String sql = "SELECT * FROM estados ORDER BY nome";
         try (Connection conn = ConectaBanco.getConexao();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
+            List<Estado> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("nome"));
+                lista.add(new Estado(rs.getInt("id"), rs.getString("nome"), rs.getString("sigla")));
             }
             return lista;
         } catch (SQLException e) {

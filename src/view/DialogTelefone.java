@@ -5,62 +5,66 @@
  */
 package view;
 
+import db.ClienteDao;
+import db.FornecedorDao;
 import db.TelefoneDao;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import modelo.Cliente;
+import modelo.Fornecedor;
 import modelo.Telefone;
+import utilitarios.DefaultCM;
 import utilitarios.TelefoneTM;
 
 /**
  *
  * @author Leandro Guina
  */
-public class DialogTelefone extends javax.swing.JDialog implements ActionListener {
+public class DialogTelefone extends javax.swing.JDialog {
 
     private final TelefoneDao telefoneDao;
+    private final FornecedorDao fornecedorDao;
+    private final ClienteDao clienteDao;
     private final TelefoneTM modeloTabela;
-    private final DefaultComboBoxModel modeloCombo;
+    private final DefaultCM<Fornecedor> modeloComboFornecedor;
+    private final DefaultCM<Cliente> modeloComboCliente;
     private static final int QWERY = 0;
     private static final int INSERT = 1;
     private static final int UPDATE = 2;
-    private static final int DIALOG = 3;
     private int current;
     private int modo;
-    private boolean comboLock;
     private String tipo;
 
     /**
      * Creates new form DialogTelefone
      */
-    public DialogTelefone() {
-        telefoneDao = new TelefoneDao();
-        modeloTabela = new TelefoneTM(telefoneDao.getAll());
-        modeloCombo = new DefaultComboBoxModel();
-        initComponents();
-        inicializa();
-    }
-
     public DialogTelefone(Frame owner, boolean modal) {
         super(owner, modal);
         telefoneDao = new TelefoneDao();
+        fornecedorDao = new FornecedorDao();
+        clienteDao = new ClienteDao();
         modeloTabela = new TelefoneTM();
-        modeloCombo = new DefaultComboBoxModel();
+        modeloComboFornecedor = new DefaultCM<>();
+        modeloComboCliente = new DefaultCM<>();
         initComponents();
         inicializa();
     }
 
     private void inicializa() {
+        // variaveis globais
         current = 0;
         modo = QWERY;
-        comboLock = false;
-        comboNome.setModel(modeloCombo);
-        comboNome.addActionListener(this);
+
+        // comboBox
+        modeloComboFornecedor.addAll(fornecedorDao.getAll());
+        modeloComboCliente.addAll(clienteDao.getAll());
+
+//        comboNome.setModel(modeloCombo);
+//        modeloCombo.add("");
+        // tabela
         tabelaTelefone.setModel(modeloTabela);
         tabelaTelefone.getColumnModel().getColumn(0).setPreferredWidth(40);
         tabelaTelefone.getColumnModel().getColumn(0).setResizable(false);
@@ -75,27 +79,26 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, true, false, true, true, true, false, true, true, true);
+                setInterface(false, true, false, true, true, true, false, true, true);
                 break;
             case INSERT:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, false, true, false, false, true);
+                setInterface(true, false, true, false, false, false, true, false, false);
+                campoNumero.setText("");
+                campoNumero.setValue(null);
+                campoNumero.requestFocus();
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, false, true, false, false, false, true, false, true, false);
-                break;
-            case DIALOG:
-                this.modo = modo;
-                setInterface(false, false, true, true, true, true, false, true, false, true);
+                setInterface(true, false, true, false, false, false, true, false, true);
+                campoNumero.requestFocus();
                 break;
             default:
                 break;
         }
     }
 
-    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela, boolean combo, boolean limpaCampos) {
-        limpaCampos(limpaCampos);
+    private void setInterface(boolean nome, boolean novo, boolean salva, boolean edita, boolean apaga, boolean navegacao, boolean cancela, boolean tabela, boolean combo) {
         campoNumero.setEnabled(nome);
         botaoSalva.setEnabled(salva);
         botaoEdita.setEnabled(edita);
@@ -111,28 +114,32 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
         tabelaTelefone.setFocusable(tabela);
     }
 
+    private void setCurrent(int current) {
+        this.current = current;
+        preencheCampos();
+    }
+
+    private void setTipo(String tipo) {
+        this.tipo = tipo;
+        reloadCombo();
+        campoNumero.setText("");
+        comboNome.setSelectedItem(null);
+        modeloTabela.limpar();
+    }
+
     private void preencheCampos() {
         Telefone telefone = modeloTabela.get(current);
         campoNumero.setText(telefone.getNumero());
     }
 
-    private void limpaCampos(boolean opcao) {
-        if (opcao) {
-            campoNumero.setValue(null);
-            tabelaTelefone.clearSelection();
-        }
-    }
-
     private void reloadCombo() {
-        comboNome.removeActionListener(this);
-        modeloCombo.removeAllElements();
-        modeloCombo.addElement("");
         if (radioCliente.isSelected()) {
-            modeloCombo.addAll(telefoneDao.clientes());
+            comboNome.setModel(modeloComboCliente);
         } else if (radioFornecedor.isSelected()) {
-            modeloCombo.addAll(telefoneDao.fornecedores());
+            comboNome.setModel(modeloComboFornecedor);
+            comboNome.repaint();
         }
-        comboNome.addActionListener(this);
+        modeloComboFornecedor.setSelectedItem(null);
     }
 
     private boolean validaCampos() {
@@ -141,11 +148,6 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
             return false;
         }
         return true;
-    }
-
-    private void setCurrent(int current) {
-        this.current = current;
-        preencheCampos();
     }
 
     /**
@@ -340,6 +342,12 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
         labelNome.setText("Nome:");
 
+        comboNome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboNomeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -437,7 +445,6 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
     private void botaoNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoActionPerformed
         setModo(INSERT);
-        campoNumero.requestFocus();
     }//GEN-LAST:event_botaoNovoActionPerformed
 
     private void botaoSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvaActionPerformed
@@ -445,8 +452,8 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
 
             if (modo == INSERT) {
                 Telefone telefone = new Telefone(campoNumero.getText());
-                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), tipo);
-                telefone.setId(id);
+//                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), tipo);
+//                telefone.setId(id);
                 modeloTabela.add(telefone);
             } else if (modo == UPDATE) {
                 Telefone telefone = new Telefone(modeloTabela.get(current).getId(), campoNumero.getText());
@@ -462,7 +469,6 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
             JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
         } else {
             setModo(UPDATE);
-            campoNumero.requestFocus();
         }
     }//GEN-LAST:event_botaoEditaActionPerformed
 
@@ -485,15 +491,14 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     private void tabelaTelefoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaTelefoneMouseClicked
         if (modo == QWERY) {
             setCurrent(tabelaTelefone.getSelectedRow());
-            if (modo == UPDATE) {
-//            setModo(QWERY);
-            }
         }
     }//GEN-LAST:event_tabelaTelefoneMouseClicked
 
     private void botaoPrimeiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoPrimeiroActionPerformed
-        setCurrent(0);
-        tabelaTelefone.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(0);
+            tabelaTelefone.setRowSelectionInterval(current, current);
+        }
     }//GEN-LAST:event_botaoPrimeiroActionPerformed
 
     private void botaoProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoProximoActionPerformed
@@ -510,8 +515,11 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     }//GEN-LAST:event_botaoProximoActionPerformed
 
     private void botaoUltimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoUltimoActionPerformed
-        setCurrent(modeloTabela.getRowCount() - 1);
-        tabelaTelefone.setRowSelectionInterval(current, current);
+        if (!modeloTabela.isEmpty()) {
+            setCurrent(modeloTabela.getRowCount() - 1);
+            tabelaTelefone.setRowSelectionInterval(current, current);
+        }
+
     }//GEN-LAST:event_botaoUltimoActionPerformed
 
     private void botaoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoAnteriorActionPerformed
@@ -524,37 +532,38 @@ public class DialogTelefone extends javax.swing.JDialog implements ActionListene
     }//GEN-LAST:event_botaoAnteriorActionPerformed
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
+        if (modo == INSERT) {
+            campoNumero.setText("");
+        } else {
+            preencheCampos();
+        }
         setModo(QWERY);
     }//GEN-LAST:event_botaoCancelaActionPerformed
 
     private void radioClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioClienteItemStateChanged
         if (radioCliente.isSelected()) {
-            tipo = "Cliente";
-            reloadCombo();
+            setTipo("Cliente");
         }
     }//GEN-LAST:event_radioClienteItemStateChanged
 
     private void radioFornecedorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioFornecedorItemStateChanged
         if (radioFornecedor.isSelected()) {
-            tipo = "Fornecedor";
-            reloadCombo();
+            setTipo("Fornecedor");
         }
     }//GEN-LAST:event_radioFornecedorItemStateChanged
 
-    public List<String> dialog(){
-        setModo(DIALOG);
+    private void comboNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboNomeActionPerformed
+//        if (comboNome.getSelectedItem() != null) {
+//        if()
+//        String nome = comboNome.getSelectedItem().toString();
+//        modeloTabela.limpar();
+//        modeloTabela.addLista(comboNome.getSelectedItem());
+//        }
+    }//GEN-LAST:event_comboNomeActionPerformed
+
+    public List<Telefone> dialog() {
         setVisible(true);
         return modeloTabela.getLista();
-    }
-    
-    
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == comboNome) {
-            modeloTabela.limpar();
-            modeloTabela.addLista(telefoneDao.numeros(comboNome.getSelectedItem().toString(), tipo));
-            System.out.println(campoNumero.getText());
-        }
     }
 
     /**

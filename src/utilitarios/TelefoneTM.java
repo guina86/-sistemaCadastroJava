@@ -122,8 +122,8 @@ public class TelefoneTM extends AbstractTableModel {
         fireTableRowsInserted(tamanhoAntigo, getRowCount() - 1);
     }
     
-    public List<String> getLista(){
-        return linhas.stream().map(Telefone::getNumero).collect(Collectors.toList());
+    public List<Telefone> getLista(){
+        return linhas;
     }
     
     public void limpar(){

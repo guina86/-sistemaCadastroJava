@@ -14,8 +14,13 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import modelo.Bairro;
+import modelo.Cidade;
 import modelo.Cliente;
+import modelo.Estado;
+import modelo.Telefone;
 import utilitarios.ClienteTM;
+import utilitarios.DefaultCM;
 
 /**
  *
@@ -25,18 +30,25 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private final ClienteDao clienteDao;
     private final ClienteTM modeloTabela;
+    private final DefaultCM<Bairro> modeloComboBairro;
+    private final DefaultCM<Cidade> modeloComboCidade;
+    private final DefaultCM<Estado> modeloComboEstado;
+    private final DefaultCM<Telefone> modeloComboTelefone;
     private static final int QWERY = 0;
     private static final int INSERT = 1;
     private static final int UPDATE = 2;
     private int current;
     private int modo;
-    private boolean comboLock;
 
     /**
      * Creates new form DialogCliente
      */
     public DialogCliente(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        modeloComboBairro = new DefaultCM<>();
+        modeloComboCidade = new DefaultCM<>();
+        modeloComboEstado = new DefaultCM<>();
+        modeloComboTelefone = new DefaultCM<>();
         clienteDao = new ClienteDao();
         modeloTabela = new ClienteTM(clienteDao.getAll());
         initComponents();
@@ -49,13 +61,10 @@ public class DialogCliente extends javax.swing.JDialog {
         modo = QWERY;
 
         //combobox
-        comboEstado.addItem("");
-        comboCidade.addItem("");
-        comboBairro.addItem("");
-        comboTelefone.addItem("");
-        clienteDao.estados().forEach(s -> comboEstado.addItem(s));
-        clienteDao.cidades().forEach(s -> comboCidade.addItem(s));
-        clienteDao.bairros().forEach(s -> comboBairro.addItem(s));
+        comboBairro.setModel(modeloComboBairro);
+        comboCidade.setModel(modeloComboCidade);
+        comboEstado.setModel(modeloComboEstado);
+        comboTelefone.setModel(modeloComboTelefone);
         comboEstado.addActionListener(e -> comboEstadoActionPerformed(e));
         comboCidade.addActionListener(e -> comboCidadeActionPerformed(e));
 
@@ -72,10 +81,6 @@ public class DialogCliente extends javax.swing.JDialog {
         tabelaCliente.getColumnModel().getColumn(4).setResizable(false);
         tabelaCliente.getColumnModel().getColumn(5).setPreferredWidth(120);
         tabelaCliente.getColumnModel().getColumn(5).setResizable(false);
-        tabelaCliente.getColumnModel().getColumn(6).setPreferredWidth(120);
-        tabelaCliente.getColumnModel().getColumn(6).setResizable(false);
-        tabelaCliente.getColumnModel().getColumn(7).setPreferredWidth(120);
-        tabelaCliente.getColumnModel().getColumn(7).setResizable(false);
         tabelaCliente.getTableHeader().setReorderingAllowed(false);
         tabelaCliente.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabelaCliente.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -92,14 +97,17 @@ public class DialogCliente extends javax.swing.JDialog {
             case QWERY:
                 this.modo = modo;
                 setInterface(false, false, false, false, true, false, false, false, true, false, false, false, true, false, true, true, false, true, true, true);
+                resetaCampos();
                 break;
             case INSERT:
                 this.modo = modo;
                 setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
+                resetaCampos();
                 break;
             case UPDATE:
                 this.modo = modo;
                 setInterface(true, true, true, true, true, true, true, true, true, true, true, true, false, true, false, false, true, false, true, false);
+                preparaCombos();
                 break;
             default:
                 break;
@@ -143,44 +151,19 @@ public class DialogCliente extends javax.swing.JDialog {
         tabelaCliente.setFocusable(tabela);
     }
 
-    private void limpaCampos() {
-        campoNome.setText("");
-        campoRg.setText("");
-        campoCpf.setText("");
-        campoEndereco.setText("");
-        comboEstado.setSelectedItem("");
-        comboTelefone.removeAllItems();
-        comboCidade.removeAllItems();
-        comboBairro.removeAllItems();
-        comboTelefone.addItem("");
-        comboCidade.addItem("");
-        comboBairro.addItem("");
-        comboCidade.setSelectedIndex(0);
-        comboBairro.setSelectedIndex(0);
-        comboTelefone.setSelectedIndex(0);
-    }
-
     private void resetaCampos() {
         campoNome.setText("");
         campoRg.setText("");
         campoCpf.setText("");
         campoCpf.setValue(null);
         campoEndereco.setText("");
-        comboTelefone.removeAllItems();
-        comboEstado.removeAllItems();
-        comboCidade.removeAllItems();
-        comboBairro.removeAllItems();
-        comboTelefone.addItem("");
-        comboEstado.addItem("");
-        comboCidade.addItem("");
-        comboBairro.addItem("");
-        clienteDao.estados().forEach(s -> comboEstado.addItem(s));
-        clienteDao.cidades().forEach(s -> comboCidade.addItem(s));
-        clienteDao.bairros().forEach(s -> comboBairro.addItem(s));
-        comboEstado.setSelectedIndex(0);
-        comboCidade.setSelectedItem(0);
-        comboBairro.setSelectedItem(0);
-        comboTelefone.setSelectedIndex(0);
+        comboEstado.setSelectedItem(null);
+        comboCidade.setSelectedItem(null);
+        comboBairro.setSelectedItem(null);
+        comboTelefone.setSelectedItem(null);
+        modeloComboEstado.clear();
+        modeloComboTelefone.clear();
+        modeloComboEstado.addAll(clienteDao.estados());
     }
 
     private void preencheCampos() {
@@ -189,36 +172,32 @@ public class DialogCliente extends javax.swing.JDialog {
         campoRg.setText(cliente.getRg());
         campoCpf.setText(cliente.getCpf());
         campoEndereco.setText(cliente.getEndereco());
-        comboEstado.setSelectedItem(cliente.getEstado());
-        comboCidade.setSelectedItem(cliente.getCidade());
-        comboBairro.setSelectedItem(cliente.getBairro());
-        comboTelefone.removeAllItems();
-        List<String> telefones = clienteDao.telefones(cliente);
-        if (!telefones.isEmpty()) {
-            telefones.forEach(s -> comboTelefone.addItem(s));
-        } else {
-            comboTelefone.addItem("");
+        modeloComboEstado.clear();
+        modeloComboEstado.add(cliente.getBairro().getCidade().getEstado());
+        modeloComboCidade.clear();
+        modeloComboCidade.add(cliente.getBairro().getCidade());
+        modeloComboBairro.clear();
+        modeloComboBairro.add(cliente.getBairro());
+        modeloComboTelefone.clear();
+        modeloComboTelefone.addAll(cliente.getTelefones());
+        if (!modeloComboTelefone.isEmpty()) {
+            comboTelefone.setSelectedIndex(0);
         }
-        comboTelefone.setSelectedIndex(0);
     }
 
     private void preparaCombos() {
-        Object selectedItem = comboBairro.getSelectedItem();
-        comboBairro.removeAllItems();
-        comboBairro.addItem("");
-        List<String> bairros = clienteDao.bairros(comboCidade.getSelectedItem().toString());
-        if (!bairros.isEmpty()) {
-            bairros.forEach(s -> comboBairro.addItem(s));
-        }
-        comboBairro.setSelectedItem(selectedItem);
-        selectedItem = comboCidade.getSelectedItem();
-        comboCidade.removeAllItems();
-        comboCidade.addItem("");
-        List<String> cidades = clienteDao.cidades(comboEstado.getSelectedItem().toString());
-        if (!cidades.isEmpty()) {
-            cidades.forEach(s -> comboCidade.addItem(s));
-        }
-        comboCidade.setSelectedItem(selectedItem);
+        Estado selectedEstado = modeloComboEstado.getSelectedItem();
+        Cidade selectedCidade = modeloComboCidade.getSelectedItem();
+        Bairro selectedBairro = modeloComboBairro.getSelectedItem();
+        modeloComboEstado.clear();
+        modeloComboEstado.addAll(clienteDao.estados());
+        modeloComboEstado.setSelectedItem(selectedEstado);
+        modeloComboCidade.clear();
+        modeloComboCidade.addAll(clienteDao.cidades(selectedEstado));
+        modeloComboCidade.setSelectedItem(selectedCidade);
+        modeloComboBairro.clear();
+        modeloComboBairro.addAll(clienteDao.bairros(selectedCidade));
+        modeloComboBairro.setSelectedItem(selectedBairro);
     }
 
     private boolean validaCampos() {
@@ -237,22 +216,20 @@ public class DialogCliente extends javax.swing.JDialog {
         if(!modeloTabela.isEmpty()){
             id = modeloTabela.get(current).getId(); 
         }
-        return new Cliente(id, campoNome.getText(), campoEndereco.getText(),
-                campoRg.getText(), campoCpf.getText(), comboBairro.getSelectedItem().toString(),
-                comboCidade.getSelectedItem().toString(), comboEstado.getSelectedItem().toString());
+        return new Cliente(id, campoNome.getText(), campoEndereco.getText(), campoRg.getText(), campoCpf.getText(), modeloComboBairro.getSelectedItem(), modeloComboTelefone.getAll());
     }
 
-    private List<String> getComboTelefones() {
-        List<String> lista = new ArrayList<>();
-        int j = comboTelefone.getModel().getSize();
-        for (int i = 0; i < j; i++) {
-            String itemAt = comboTelefone.getItemAt(i);
-            if (!itemAt.equals("")) {
-                lista.add(comboTelefone.getItemAt(i));
-            }
-        }
-        return lista;
-    }
+//    private List<String> getComboTelefones() {
+//        List<String> lista = new ArrayList<>();
+//        int j = comboTelefone.getModel().getSize();
+//        for (int i = 0; i < j; i++) {
+//            String itemAt = comboTelefone.getItemAt(i);
+//            if (!itemAt.equals("")) {
+//                lista.add(comboTelefone.getItemAt(i));
+//            }
+//        }
+//        return lista;
+//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -314,8 +291,9 @@ public class DialogCliente extends javax.swing.JDialog {
             }
         });
 
-        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edit_18p.png"))); // NOI18N
+        botaoNovoTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/addSmall.png"))); // NOI18N
         botaoNovoTelefone.setToolTipText("Novo Telefone");
+        botaoNovoTelefone.setEnabled(false);
         botaoNovoTelefone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botaoNovoTelefoneActionPerformed(evt);
@@ -637,7 +615,6 @@ public class DialogCliente extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoActionPerformed
-        limpaCampos();
         setModo(INSERT);
     }//GEN-LAST:event_botaoNovoActionPerformed
 
@@ -645,16 +622,15 @@ public class DialogCliente extends javax.swing.JDialog {
         if (validaCampos()) {
             Cliente cliente = colectaCampos();
             if (modo == INSERT) {
-                List<String> telefones = getComboTelefones();
-                int id = clienteDao.save(cliente, telefones);
+                int id = clienteDao.save(cliente);
                 cliente.setId(id);
+                cliente.setTelefones(clienteDao.telefones(cliente));
                 modeloTabela.add(cliente);
             } else if (modo == UPDATE) {
                 clienteDao.update(cliente);
                 modeloTabela.setValueAt(cliente, current);
             }
             setModo(QWERY);
-            resetaCampos();
         }
     }//GEN-LAST:event_botaoSalvaActionPerformed
 
@@ -662,7 +638,6 @@ public class DialogCliente extends javax.swing.JDialog {
         if (tabelaCliente.getSelectedRow() == -1) {
             JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
         } else {
-            preparaCombos();
             setModo(UPDATE);
         }
     }//GEN-LAST:event_botaoEditaActionPerformed
@@ -674,7 +649,7 @@ public class DialogCliente extends javax.swing.JDialog {
             int opcao = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja apagar " + campoNome.getText() + " ?",
                     "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (opcao == JOptionPane.YES_OPTION) {
-                clienteDao.delete(modeloTabela.get(current).getId());
+                clienteDao.delete(modeloTabela.get(current));
                 modeloTabela.remove(current);
             }
         }
@@ -682,7 +657,6 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private void botaoCancelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCancelaActionPerformed
         setModo(QWERY);
-        resetaCampos();
         tabelaCliente.clearSelection();
     }//GEN-LAST:event_botaoCancelaActionPerformed
 
@@ -719,22 +693,10 @@ public class DialogCliente extends javax.swing.JDialog {
 
     private void botaoNovoTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoTelefoneActionPerformed
         DialogQuickTelefone dialog = new DialogQuickTelefone((Frame) getParent(), true);
-        if (modo == INSERT) {
-            List<String> lista = getComboTelefones();
-            comboTelefone.removeAllItems();
-            List<String> editTelefone = dialog.editTelefone("Novo Cliente", "Cliente", lista);
-            editTelefone.forEach(t -> comboTelefone.addItem(t));
-        } else {
-            dialog.editTelefone(modeloTabela.get(current).getNome(), "Cliente", null);
-            comboTelefone.removeAllItems();
-            Cliente cliente = modeloTabela.get(current);
-            List<String> telefones = clienteDao.telefones(cliente);
-            if (!telefones.isEmpty()) {
-                telefones.forEach(s -> comboTelefone.addItem(s));
-            } else {
-                comboTelefone.addItem("");
-            }
-        }
+        String nome = campoNome.getText().equals("") ? "Novo Cliente" : campoNome.getText();
+        List<Telefone> telefones = dialog.editTelefone(modeloComboTelefone.getAll(), nome);
+        modeloComboTelefone.clear();
+        modeloComboTelefone.addAll(telefones);
     }//GEN-LAST:event_botaoNovoTelefoneActionPerformed
 
     private void comboTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboTelefoneActionPerformed
@@ -742,15 +704,21 @@ public class DialogCliente extends javax.swing.JDialog {
     }//GEN-LAST:event_comboTelefoneActionPerformed
 
     private void botaoNovoEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoEstadoActionPerformed
-        String estado = new DialogEstado((Frame)getParent(), true).edtitEstado();
-        comboEstado.addItem(estado);
+        Estado estado = new DialogEstado((Frame) getParent(), true).edtitEstado();
+        if (estado != null && !modeloComboEstado.getAll().contains(estado)) {
+            modeloComboEstado.add(estado);
+        }
         comboEstado.setSelectedItem(estado);
+        comboEstado.repaint();
     }//GEN-LAST:event_botaoNovoEstadoActionPerformed
 
     private void botaoNovoCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoCidadeActionPerformed
-        String cidade = new DialogCidade((Frame)getParent(), true).edtitCidade();
-        comboCidade.addItem(cidade);
+        Cidade cidade = new DialogCidade((Frame) getParent(), true).edtitCidade();
+        if (cidade != null && !modeloComboCidade.getAll().contains(cidade)) {
+            modeloComboCidade.add(cidade);
+        }
         comboCidade.setSelectedItem(cidade);
+        comboCidade.repaint();
     }//GEN-LAST:event_botaoNovoCidadeActionPerformed
 
     private void botaoNovoBairroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNovoBairroActionPerformed
@@ -766,26 +734,18 @@ public class DialogCliente extends javax.swing.JDialog {
     }
 
     private void comboEstadoActionPerformed(java.awt.event.ActionEvent e) {
-        if (modo != QWERY) {
-            comboLock = true;
-            comboCidade.removeAllItems();
-            comboCidade.addItem("");
-            List<String> cidades = clienteDao.cidades(comboEstado.getSelectedItem().toString());
-            if (!cidades.isEmpty()) {
-                cidades.forEach(s -> comboCidade.addItem(s));
-            }
-            comboLock = false;
+        if (modeloComboEstado.getSelectedItem() != null) {
+            modeloComboCidade.clear();
+            modeloComboCidade.addAll(clienteDao.cidades(modeloComboEstado.getSelectedItem()));
+            modeloComboCidade.setSelectedItem(null);
         }
     }
 
     private void comboCidadeActionPerformed(java.awt.event.ActionEvent e) {
-        if (modo != QWERY && !comboLock) {
-            comboBairro.removeAllItems();
-            comboBairro.addItem("");
-            List<String> bairros = clienteDao.bairros(comboCidade.getSelectedItem().toString());
-            if (!bairros.isEmpty()) {
-                bairros.forEach(s -> comboBairro.addItem(s));
-            }
+        if (modeloComboCidade.getSelectedItem() != null) {
+            modeloComboBairro.clear();
+            modeloComboBairro.setSelectedItem(null);
+            modeloComboBairro.addAll(clienteDao.bairros(modeloComboCidade.getSelectedItem()));
         }
     }
 

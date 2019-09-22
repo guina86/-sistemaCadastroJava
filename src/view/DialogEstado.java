@@ -60,7 +60,7 @@ public class DialogEstado extends javax.swing.JDialog {
         switch (modo) {
             case QWERY:
                 this.modo = modo;
-                setInterface(false, true, true, false, true, true, true, false, true);
+                setInterface(false, false, true, false, true, true, true, false, true);
                 break;
             case INSERT:
                 this.modo = modo;
@@ -71,7 +71,7 @@ public class DialogEstado extends javax.swing.JDialog {
                 break;
             case UPDATE:
                 this.modo = modo;
-                setInterface(true, false, false, true, false, false, false, true, false);
+                setInterface(true, true, false, true, false, false, false, true, false);
                 campoNome.requestFocus();
                 break;
             default:
@@ -189,7 +189,6 @@ public class DialogEstado extends javax.swing.JDialog {
 
         botaoEdita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/edit_36p.png"))); // NOI18N
         botaoEdita.setToolTipText("Editar");
-        botaoEdita.setEnabled(false);
         botaoEdita.setMaximumSize(new java.awt.Dimension(50, 50));
         botaoEdita.setMinimumSize(new java.awt.Dimension(50, 50));
         botaoEdita.setPreferredSize(new java.awt.Dimension(50, 50));
@@ -201,7 +200,6 @@ public class DialogEstado extends javax.swing.JDialog {
 
         botaoApaga.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/delete_36p.png"))); // NOI18N
         botaoApaga.setToolTipText("Apagar");
-        botaoApaga.setEnabled(false);
         botaoApaga.setMaximumSize(new java.awt.Dimension(50, 50));
         botaoApaga.setMinimumSize(new java.awt.Dimension(50, 50));
         botaoApaga.setPreferredSize(new java.awt.Dimension(50, 50));
@@ -420,11 +418,15 @@ public class DialogEstado extends javax.swing.JDialog {
     }//GEN-LAST:event_botaoEditaActionPerformed
 
     private void botaoApagaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoApagaActionPerformed
-        int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText() + " " + campoSigla.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
-        if (option == 0) {
-            estadoDao.delete(modeloTabela.get(current));
-            modeloTabela.remove(current);
-            campoNome.setText("");
+        if (tabelaEstado.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Nenhum registro selecionado", "Opção inválida", JOptionPane.WARNING_MESSAGE);
+        } else {
+            int option = JOptionPane.showConfirmDialog(rootPane, "Tem certeza que quer excluir " + campoNome.getText() + " " + campoSigla.getText(), "Confirmação", JOptionPane.YES_NO_OPTION);
+            if (option == 0) {
+                estadoDao.delete(modeloTabela.get(current));
+                modeloTabela.remove(current);
+                campoNome.setText("");
+            }
         }
     }//GEN-LAST:event_botaoApagaActionPerformed
 
@@ -448,7 +450,7 @@ public class DialogEstado extends javax.swing.JDialog {
         if (tabelaEstado.getSelectedRow() == -1) {
             setCurrent(0);
         } else if (size > 1 && current < size - 1) {
-            setCurrent(current +1);
+            setCurrent(current + 1);
         }
         tabelaEstado.setRowSelectionInterval(current, current);
     }//GEN-LAST:event_botaoProximoActionPerformed

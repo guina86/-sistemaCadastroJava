@@ -27,7 +27,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
 
     @Override
     public Fornecedor get(Integer id) {
-        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.id AS id_bairro, c.id AS id_cidade, e.id AS id_estado, b.nome AS bairro, c.nome AS cidade, e.nome AS estado, e.sigla "
+        String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, f.id_bairro, b.nome AS bairro, b.id_cidade, c.nome AS cidade, c.id_estado, e.nome AS estado, e.sigla "
                 + "FROM fornecedores f JOIN bairros b ON f.id_bairro = b.id "
                 + "JOIN cidades c ON b.id_cidade = c.id "
                 + "JOIN estados e ON c.id_estado = e.id "
@@ -43,7 +43,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
                 ps2.setInt(1, id);
                 ResultSet rs2 = ps2.executeQuery();
                 List<Telefone> telefones = new ArrayList<>();
-                while(rs2.next()){
+                while (rs2.next()) {
                     telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
                 }
                 Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
@@ -70,13 +70,13 @@ public class FornecedorDao implements Dao<Fornecedor> {
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql2);
                 Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)){
+                ResultSet rs = st.executeQuery(sql)) {
             List<Fornecedor> fornecedores = new ArrayList<>();
             while (rs.next()) {
                 ps.setInt(1, rs.getInt("id"));
                 ResultSet rs2 = ps.executeQuery();
                 List<Telefone> telefones = new ArrayList<>();
-                while(rs2.next()){
+                while (rs2.next()) {
                     telefones.add(new Telefone(rs2.getInt("id"), rs2.getString("numero")));
                 }
                 Estado estado = new Estado(rs.getInt("id_estado"), rs.getString("estado"), rs.getString("sigla"));
@@ -100,7 +100,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 PreparedStatement ps2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement ps3 = conn.prepareStatement(sql3)){
+                PreparedStatement ps3 = conn.prepareStatement(sql3)) {
             conn.setAutoCommit(false);
             ps.setString(1, fornecedor.getNome());
             ps.setString(2, fornecedor.getCnpj());
@@ -110,16 +110,16 @@ public class FornecedorDao implements Dao<Fornecedor> {
             ResultSet rs = ps.getGeneratedKeys();
             int id = 0;
             if (rs.next()) {
-                id =  rs.getInt(1);
+                id = rs.getInt(1);
             }
             rs.close();
-            if(!fornecedor.getTelefones().isEmpty()){
-                for(Telefone telefone : fornecedor.getTelefones()){
+            if (!fornecedor.getTelefones().isEmpty()) {
+                for (Telefone telefone : fornecedor.getTelefones()) {
                     ps2.setString(1, telefone.getNumero());
                     ps2.executeUpdate();
                     ResultSet rs2 = ps2.getGeneratedKeys();
                     int idTel = 0;
-                    if(rs.next()){
+                    if (rs2.next()) {
                         idTel = rs2.getInt(1);
                     }
                     ps3.setInt(1, idTel);
@@ -137,47 +137,6 @@ public class FornecedorDao implements Dao<Fornecedor> {
         return 0;
     }
 
-    public int save(Fornecedor fornecedor, List<String> telefones) {
-        String sql = "INSERT INTO fornecedores (nome, cnpj, endereco, id_bairro) VALUES (?, ?, ?, ?)";
-        String sql2 = "INSERT INTO telefones (numero) VALUES (?)";
-        String sql3 = "INSERT INTO telefone_fornecedor (id_telefone, id_fornecedor) VALUES (? , ?)";
-        try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement ps2 = conn.prepareStatement(sql2, Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement ps3 = conn.prepareStatement(sql3)) {
-            conn.setAutoCommit(false);
-            ps.setString(1, fornecedor.getNome());
-            ps.setString(2, fornecedor.getCnpj());
-            ps.setString(3, fornecedor.getEndereco());
-            ps.setString(4, fornecedor.getBairro().getNome());
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            int id = 0;
-            if (rs.next()) {
-                id = rs.getInt(1);
-            }
-            rs.close();
-            for (String telefone : telefones) {
-                ps2.setString(1, telefone);
-                ps2.executeUpdate();
-                ResultSet rs2 = ps2.getGeneratedKeys();
-                int idTel = 0;
-                if (rs2.next()) {
-                    idTel = rs2.getInt(1);
-                }
-                ps3.setInt(1, idTel);
-                ps3.setInt(2, id);
-                ps3.executeUpdate();
-                rs2.close();
-            }
-            conn.commit();
-            conn.setAutoCommit(true);
-            return id;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
     @Override
     public void update(Fornecedor fornecedor) {
@@ -207,7 +166,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
                 PreparedStatement ps3 = conn.prepareStatement(sql3)) {
             ps.setInt(1, fornecedor.getId());
             ps.executeUpdate();
-            if(!fornecedor.getTelefones().isEmpty()){
+            if (!fornecedor.getTelefones().isEmpty()) {
                 for (Telefone telefone : fornecedor.getTelefones()) {
                     ps2.setInt(1, telefone.getId());
                     ps2.executeUpdate();
@@ -220,42 +179,15 @@ public class FornecedorDao implements Dao<Fornecedor> {
         }
     }
 
-    public void delete(int id) {
-        String sql = "DELETE FROM fornecedores WHERE id = ?";
-        try (Connection conn = ConectaBanco.getConexao();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Telefone> telefones() {
-        String sql = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone ORDER BY numero";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<Telefone> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(new Telefone(rs.getInt("id"),rs.getString("numero")));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<String> telefones(Fornecedor fornecedor) {
-        String sql = "SELECT numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ? ORDER BY numero";
+    public List<Telefone> telefones(Fornecedor fornecedor) {
+        String sql = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ? ORDER BY numero";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, fornecedor.getId());
             ResultSet rs = ps.executeQuery();
-            List<String> lista = new ArrayList<>();
+            List<Telefone> lista = new ArrayList<>();
             while (rs.next()) {
-                lista.add(rs.getString("numero"));
+                lista.add(new Telefone(rs.getInt("id"),rs.getString("numero")));
             }
             rs.close();
             return lista;
@@ -263,23 +195,6 @@ public class FornecedorDao implements Dao<Fornecedor> {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public List<String> bairros() {
-        String sql = "SELECT nome FROM bairros ORDER BY nome";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-
     }
 
     public List<Bairro> bairros(Cidade cidade) {
@@ -293,23 +208,6 @@ public class FornecedorDao implements Dao<Fornecedor> {
                 lista.add(new Bairro(rs.getInt("id"), rs.getString("nome"), cidade));
             }
             rs.close();
-            return lista;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
-
-    public List<String> cidades() {
-        String sql = "SELECT nome FROM cidades ORDER BY nome";
-        try (Connection conn = ConectaBanco.getConexao();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery(sql)) {
-            List<String> lista = new ArrayList<>();
-            while (rs.next()) {
-                lista.add(rs.getString("nome"));
-            }
             return lista;
         } catch (SQLException e) {
             e.printStackTrace();

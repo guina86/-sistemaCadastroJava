@@ -5,69 +5,69 @@
  */
 package modelo;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
  *
  * @author Leandro Guina
  */
-public class Cliente {
-    private Integer id;
-    private String nome;
-    private String endereco;
+public class Cliente extends Pessoa {
     private String rg;
     private String cpf;
-    private String bairro;
-    private String cidade;
-    private String Estado;
+       
+    public Cliente(String nome, String endereco, String rg, String cpf, Bairro bairro) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.rg = rg;
+        this.cpf = cpf;
+        this.bairro = bairro;
+    }
+
+    public Cliente(String nome, String endereco, String rg, String cpf, Bairro bairro, List<Telefone> telefones) {
+        this.nome = nome;
+        this.endereco = endereco;
+        this.rg = rg;
+        this.cpf = cpf;
+        this.bairro = bairro;
+        this.telefones = telefones;
+    }
+
+    public Cliente(Integer id, String nome, String endereco, String rg, String cpf, Bairro bairro, List<Telefone> telefones) {
+        this.id = id;
+        this.nome = nome;
+        this.endereco = endereco;
+        this.rg = rg;
+        this.cpf = cpf;
+        this.bairro = bairro;
+        this.telefones = telefones;
+    }
     
-    public Cliente() {
-        
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        return hash;
     }
 
-    public Cliente(Integer id, String nome, String endereco, String rg, String cpf, String bairro, String cidade, String Estado) {
-        this.id = id;
-        this.nome = nome;
-        this.endereco = endereco;
-        this.rg = rg;
-        this.cpf = cpf;
-        this.bairro = bairro;
-        this.cidade = cidade;
-        this.Estado = Estado;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Fornecedor other = (Fornecedor) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
-   
-    public Cliente(String nome, String endereco, String rg, String cpf, String bairro, String cidade, String Estado) {
-        this.nome = nome;
-        this.endereco = endereco;
-        this.rg = rg;
-        this.cpf = cpf;
-        this.bairro = bairro;
-        this.cidade = cidade;
-        this.Estado = Estado;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(String endereco) {
-        this.endereco = endereco;
-    }
-
+    
     public String getRg() {
         return rg;
     }
@@ -84,33 +84,9 @@ public class Cliente {
         this.cpf = cpf;
     }
 
-    public String getBairro() {
-        return bairro;
-    }
-
-    public void setBairro(String bairro) {
-        this.bairro = bairro;
-    }
-
-    public String getCidade() {
-        return cidade;
-    }
-
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
-
-    public String getEstado() {
-        return Estado;
-    }
-
-    public void setEstado(String Estado) {
-        this.Estado = Estado;
-    }
-
     @Override
     public String toString() {
-        return "Cliente{" + "id=" + id + ", nome=" + nome + ", endereco=" + endereco + ", rg=" + rg + ", cpf=" + cpf + ", bairro=" + bairro + ", cidade=" + cidade + ", Estado=" + Estado + '}';
+        return getNome();
     }
 
         
