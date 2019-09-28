@@ -61,7 +61,7 @@ public class Cliente extends Pessoa {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Fornecedor other = (Fornecedor) obj;
+        final Cliente other = (Cliente) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

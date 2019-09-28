@@ -46,7 +46,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Cadastro de Clientes">
+            <TitledBorder title="Cadastro de Fornecedores">
               <Font PropertyName="font" name="Tahoma" size="18" style="0"/>
             </TitledBorder>
           </Border>
@@ -66,13 +66,13 @@
                               <Component id="labelEndereco" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="campoNome" min="-2" pref="275" max="-2" attributes="0"/>
-                              <Component id="campoEndereco" min="-2" pref="275" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="campoEndereco" pref="196" max="32767" attributes="0"/>
+                              <Component id="campoNome" max="32767" attributes="0"/>
                           </Group>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Group type="102" attributes="0">
-                                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                                   <Component id="labelEstado" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="comboEstado" min="-2" pref="140" max="-2" attributes="0"/>
@@ -128,7 +128,7 @@
                           <Component id="botaoVolta" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="0" pref="11" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

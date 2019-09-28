@@ -65,7 +65,7 @@ public class FornecedorDao implements Dao<Fornecedor> {
         String sql = "SELECT f.id, f.nome, f.cnpj, f.endereco, b.id AS id_bairro, c.id AS id_cidade, e.id AS id_estado, b.nome AS bairro, c.nome AS cidade, e.nome AS estado, e.sigla "
                 + "FROM fornecedores f JOIN bairros b ON f.id_bairro = b.id "
                 + "JOIN cidades c ON b.id_cidade = c.id "
-                + "JOIN estados e ON c.id_estado = e.id ";
+                + "JOIN estados e ON c.id_estado = e.id";
         String sql2 = "SELECT id, numero FROM telefones JOIN telefone_fornecedor ON id = id_telefone WHERE id_fornecedor = ?";
         try (Connection conn = ConectaBanco.getConexao();
                 PreparedStatement ps = conn.prepareStatement(sql2);

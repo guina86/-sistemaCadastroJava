@@ -28,88 +28,93 @@ public class Principal extends javax.swing.JFrame {
     private void initComponents() {
 
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
-        jMenu5 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
+        menuCadastro = new javax.swing.JMenu();
+        itemMenuEstado = new javax.swing.JMenuItem();
+        itemMenuCidade = new javax.swing.JMenuItem();
+        itemMenuBairro = new javax.swing.JMenuItem();
+        itemMenuTelefone = new javax.swing.JMenuItem();
+        itemMenuCliente = new javax.swing.JMenuItem();
+        itemMenuFornecedor = new javax.swing.JMenuItem();
+        itemMenuProduto = new javax.swing.JMenuItem();
+        menuCompra = new javax.swing.JMenu();
+        menuVenda = new javax.swing.JMenu();
+        menuRelatorio = new javax.swing.JMenu();
+        menuSair = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de vendas");
 
-        jMenu1.setText("Cadastros");
+        menuCadastro.setText("Cadastros");
 
-        jMenuItem1.setText("Estados");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        itemMenuEstado.setText("Estados");
+        itemMenuEstado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                itemMenuEstadoActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        menuCadastro.add(itemMenuEstado);
 
-        jMenuItem2.setText("Cidades");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        itemMenuCidade.setText("Cidades");
+        itemMenuCidade.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                itemMenuCidadeActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem2);
+        menuCadastro.add(itemMenuCidade);
 
-        jMenuItem3.setText("Bairro");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        itemMenuBairro.setText("Bairro");
+        itemMenuBairro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                itemMenuBairroActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem3);
+        menuCadastro.add(itemMenuBairro);
 
-        jMenuItem4.setText("Telefones");
-        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+        itemMenuTelefone.setText("Telefones");
+        itemMenuTelefone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem4ActionPerformed(evt);
+                itemMenuTelefoneActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem4);
+        menuCadastro.add(itemMenuTelefone);
 
-        jMenuItem5.setText("Clientes");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+        itemMenuCliente.setText("Clientes");
+        itemMenuCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
+                itemMenuClienteActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem5);
+        menuCadastro.add(itemMenuCliente);
 
-        jMenuItem6.setText("Fornecedores");
-        jMenu1.add(jMenuItem6);
+        itemMenuFornecedor.setText("Fornecedores");
+        itemMenuFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemMenuFornecedorActionPerformed(evt);
+            }
+        });
+        menuCadastro.add(itemMenuFornecedor);
 
-        jMenuItem7.setText("Produtos");
-        jMenu1.add(jMenuItem7);
+        itemMenuProduto.setText("Produtos");
+        menuCadastro.add(itemMenuProduto);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(menuCadastro);
 
-        jMenu3.setText("Compra");
-        jMenuBar1.add(jMenu3);
+        menuCompra.setText("Compra");
+        jMenuBar1.add(menuCompra);
 
-        jMenu4.setText("Venda");
-        jMenuBar1.add(jMenu4);
+        menuVenda.setText("Venda");
+        jMenuBar1.add(menuVenda);
 
-        jMenu5.setText("Relatórios");
-        jMenuBar1.add(jMenu5);
+        menuRelatorio.setText("Relatórios");
+        jMenuBar1.add(menuRelatorio);
 
-        jMenu2.setText("Sair");
-        jMenu2.addMouseListener(new java.awt.event.MouseAdapter() {
+        menuSair.setText("Sair");
+        menuSair.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenu2MouseClicked(evt);
+                menuSairMouseClicked(evt);
             }
         });
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(menuSair);
 
         setJMenuBar(jMenuBar1);
 
@@ -128,34 +133,39 @@ public class Principal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
+    private void menuSairMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSairMouseClicked
         this.dispose();
-    }//GEN-LAST:event_jMenu2MouseClicked
+    }//GEN-LAST:event_menuSairMouseClicked
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void itemMenuEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuEstadoActionPerformed
         DialogEstado dialog = new DialogEstado(this, true);
         dialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_itemMenuEstadoActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void itemMenuCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuCidadeActionPerformed
         DialogCidade dialog = new DialogCidade(this, true);
         dialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_itemMenuCidadeActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void itemMenuBairroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuBairroActionPerformed
         DialogBairro dialog = new DialogBairro(this, true);
         dialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }//GEN-LAST:event_itemMenuBairroActionPerformed
 
-    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    private void itemMenuTelefoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuTelefoneActionPerformed
         DialogTelefone dialog = new DialogTelefone(this, true);
         dialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem4ActionPerformed
+    }//GEN-LAST:event_itemMenuTelefoneActionPerformed
 
-    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+    private void itemMenuClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuClienteActionPerformed
         DialogCliente dialog = new DialogCliente(this, true);
         dialog.setVisible(true);
-    }//GEN-LAST:event_jMenuItem5ActionPerformed
+    }//GEN-LAST:event_itemMenuClienteActionPerformed
+
+    private void itemMenuFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemMenuFornecedorActionPerformed
+        DialogFornecedor dialog = new DialogFornecedor(this, true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_itemMenuFornecedorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -194,18 +204,18 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenuItem itemMenuBairro;
+    private javax.swing.JMenuItem itemMenuCidade;
+    private javax.swing.JMenuItem itemMenuCliente;
+    private javax.swing.JMenuItem itemMenuEstado;
+    private javax.swing.JMenuItem itemMenuFornecedor;
+    private javax.swing.JMenuItem itemMenuProduto;
+    private javax.swing.JMenuItem itemMenuTelefone;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenu menuCadastro;
+    private javax.swing.JMenu menuCompra;
+    private javax.swing.JMenu menuRelatorio;
+    private javax.swing.JMenu menuSair;
+    private javax.swing.JMenu menuVenda;
     // End of variables declaration//GEN-END:variables
 }

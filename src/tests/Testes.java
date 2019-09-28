@@ -5,7 +5,9 @@
  */
 package tests;
 
-import modelo.Cliente;
+import db.ProdutoDao;
+import java.util.List;
+import modelo.Produto;
 
 /**
  *
@@ -15,7 +17,9 @@ public class Testes {
 
     public static void main(String[] args) {
 
-//        Cliente cliente = new Cliente("Amoeba", "Rua grub", "43443443443", "765.654.345-23", 3);
+        ProdutoDao dao = new ProdutoDao();
+        Produto find = dao.find("8");
+        System.out.println(find);
         
     }
 

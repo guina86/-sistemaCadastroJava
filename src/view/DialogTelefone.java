@@ -449,11 +449,15 @@ public class DialogTelefone extends javax.swing.JDialog {
 
     private void botaoSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoSalvaActionPerformed
         if (validaCampos()) {
-
             if (modo == INSERT) {
                 Telefone telefone = new Telefone(campoNumero.getText());
-//                int id = telefoneDao.save(telefone, comboNome.getSelectedItem().toString(), tipo);
-//                telefone.setId(id);
+                int id = 0;
+                if(tipo == "Cliente"){
+                    id = telefoneDao.save(telefone, modeloComboCliente.getSelectedItem().getId(), tipo);
+                } else {
+                    id = telefoneDao.save(telefone, modeloComboFornecedor.getSelectedItem().getId(), tipo);
+                }
+                telefone.setId(id);
                 modeloTabela.add(telefone);
             } else if (modo == UPDATE) {
                 Telefone telefone = new Telefone(modeloTabela.get(current).getId(), campoNumero.getText());
@@ -553,12 +557,16 @@ public class DialogTelefone extends javax.swing.JDialog {
     }//GEN-LAST:event_radioFornecedorItemStateChanged
 
     private void comboNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboNomeActionPerformed
-//        if (comboNome.getSelectedItem() != null) {
-//        if()
-//        String nome = comboNome.getSelectedItem().toString();
-//        modeloTabela.limpar();
-//        modeloTabela.addLista(comboNome.getSelectedItem());
-//        }
+        if (comboNome.getSelectedItem() != null) {
+            modeloTabela.limpar();
+            if (tipo == "Cliente") {
+                modeloTabela.addLista(modeloComboCliente.getSelectedItem().getTelefones());
+                
+            } else {
+                modeloTabela.addLista(modeloComboFornecedor.getSelectedItem().getTelefones());
+            }
+        }
+
     }//GEN-LAST:event_comboNomeActionPerformed
 
     public List<Telefone> dialog() {

@@ -46,7 +46,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Cadastro de Clientes">
+            <TitledBorder title="Cadastro de Produtos">
               <Font PropertyName="font" name="Tahoma" size="18" style="0"/>
             </TitledBorder>
           </Border>
@@ -59,86 +59,68 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="botaoNovo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoSalva" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoEdita" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoApaga" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoCancela" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="botaoPesquisa" pref="178" max="32767" attributes="0"/>
+                              <Component id="campoPesquisa" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoPrimeiro" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoAnterior" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoProximo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="botaoUltimo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoVolta" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="labelNome" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelEndereco" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="labelCodigo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="campoCodigo" min="-2" pref="58" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="labelProduto" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="campoProduto" min="-2" pref="349" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="campoNome" pref="196" max="32767" attributes="0"/>
-                                  <Component id="campoEndereco" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="labelRg" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelEstado" alignment="1" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="comboEstado" min="-2" pref="140" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="botaoNovoEstado" min="-2" pref="22" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="campoRg" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="labelCpf" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelCidade" alignment="1" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="comboCidade" min="-2" pref="140" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="botaoNovoCidade" min="-2" pref="22" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="campoCpf" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="labelTel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelBairro" alignment="1" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="comboTelefone" min="-2" pref="140" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="botaoNovoTelefone" min="-2" pref="22" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="comboBairro" min="-2" pref="140" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="botaoNovoBairro" min="-2" pref="22" max="-2" attributes="0"/>
-                                  </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="labelPrecoCompra" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="campoPrecoCompra" min="-2" pref="164" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="labelPrecoVenda" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="campoPrecoVenda" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="163" max="-2" attributes="0"/>
-                              <Component id="botaoNovo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoSalva" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoEdita" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoApaga" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoCancela" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                              <Component id="botaoPrimeiro" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoAnterior" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoProximo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="botaoUltimo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                              <Component id="botaoVolta" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="labelQuantidade" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                                  <Component id="labelFornecedor" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="comboFornecedor" pref="180" max="32767" attributes="0"/>
+                              <Component id="campoQuantidade" alignment="1" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -151,42 +133,41 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="labelNome" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="campoNome" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelRg" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="campoRg" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelCpf" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="campoCpf" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelTel" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="comboTelefone" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoNovoTelefone" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="labelCodigo" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="campoCodigo" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="labelProduto" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="campoProduto" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="labelQuantidade" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="campoQuantidade" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="labelEndereco" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="campoEndereco" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelEstado" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="comboEstado" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoNovoEstado" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelCidade" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="comboCidade" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoNovoCidade" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="labelBairro" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="comboBairro" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoNovoBairro" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="comboFornecedor" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="labelFornecedor" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="campoPrecoVenda" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="labelPrecoVenda" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="campoPrecoCompra" alignment="2" min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="labelPrecoCompra" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="2" attributes="0">
-                      <Component id="botaoNovo" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoSalva" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoEdita" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoApaga" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoCancela" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoPrimeiro" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoAnterior" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoProximo" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoUltimo" alignment="2" min="-2" max="-2" attributes="0"/>
-                      <Component id="botaoVolta" alignment="2" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="103" groupAlignment="2" attributes="0">
+                          <Component id="botaoNovo" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoSalva" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoEdita" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoApaga" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoCancela" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoPrimeiro" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoAnterior" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoProximo" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoUltimo" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="botaoVolta" alignment="2" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="campoPesquisa" min="-2" pref="22" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="botaoPesquisa" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="320" max="-2" attributes="0"/>
@@ -196,85 +177,47 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="labelNome">
+        <Component class="javax.swing.JLabel" name="labelCodigo">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Nome:"/>
+            <Property name="text" type="java.lang.String" value="C&#xf3;digo:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="campoNome">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="labelTel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Tel:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="comboTelefone">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="0"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboTelefoneActionPerformed"/>
-          </Events>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-          </AuxValues>
-        </Component>
-        <Component class="javax.swing.JButton" name="botaoNovoTelefone">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/imagens/addSmall.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Novo Telefone"/>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoTelefoneActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JLabel" name="labelEndereco">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Endere&#xe7;o:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="campoEndereco">
+        <Component class="javax.swing.JTextField" name="campoCodigo">
           <Properties>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="labelRg">
+        <Component class="javax.swing.JLabel" name="labelPrecoCompra">
           <Properties>
-            <Property name="text" type="java.lang.String" value="RG:"/>
+            <Property name="text" type="java.lang.String" value="Ppre&#xe7;o de Compra:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="campoRg">
+        <Component class="javax.swing.JTextField" name="campoPrecoCompra">
           <Properties>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="labelCpf">
+        <Component class="javax.swing.JLabel" name="labelProduto">
           <Properties>
-            <Property name="text" type="java.lang.String" value="CPF:"/>
+            <Property name="text" type="java.lang.String" value="Produto:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JFormattedTextField" name="campoCpf">
+        <Component class="javax.swing.JTextField" name="campoProduto">
           <Properties>
-            <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor" preCode="try {" postCode="} catch (java.text.ParseException ex) {&#xa;ex.printStackTrace();&#xa;}">
-              <Format format="###.###.###-##" subtype="-1" type="5"/>
-            </Property>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="labelBairro">
+        <Component class="javax.swing.JLabel" name="labelQuantidade">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Bairro:"/>
+            <Property name="text" type="java.lang.String" value="Quantidade:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="comboBairro">
+        <Component class="javax.swing.JLabel" name="labelFornecedor">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Fornecedor:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="comboFornecedor">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="0"/>
@@ -284,18 +227,6 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
-        </Component>
-        <Component class="javax.swing.JButton" name="botaoNovoBairro">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/imagens/addSmall.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Novo Bairro"/>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoBairroActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="botaoNovo">
           <Properties>
@@ -507,7 +438,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTable" name="tabelaCliente">
+            <Component class="javax.swing.JTable" name="tabelaProduto">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="modeloTabela" type="code"/>
@@ -522,62 +453,31 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JLabel" name="labelCidade">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Cidade:"/>
-          </Properties>
+        <Component class="javax.swing.JTextField" name="campoPesquisa">
         </Component>
-        <Component class="javax.swing.JComboBox" name="comboCidade">
+        <Component class="javax.swing.JButton" name="botaoPesquisa">
           <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="0"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-          </AuxValues>
-        </Component>
-        <Component class="javax.swing.JButton" name="botaoNovoCidade">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/imagens/addSmall.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Nova Cidade"/>
-            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="Pesquisar"/>
+            <Property name="toolTipText" type="java.lang.String" value="Pesquisar"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoCidadeActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoPesquisaActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="labelEstado">
+        <Component class="javax.swing.JLabel" name="labelPrecoVenda">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Estado:"/>
+            <Property name="text" type="java.lang.String" value="Pre&#xe7;o de Venda:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="comboEstado">
+        <Component class="javax.swing.JTextField" name="campoPrecoVenda">
           <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="0"/>
-            </Property>
-            <Property name="actionCommand" type="java.lang.String" value="comboEstado"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-          </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="botaoNovoEstado">
+        <Component class="javax.swing.JTextField" name="campoQuantidade">
           <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/imagens/addSmall.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Novo Estado"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botaoNovoEstadoActionPerformed"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>
